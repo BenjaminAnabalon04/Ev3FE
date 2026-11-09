@@ -13,7 +13,7 @@ User = get_user_model()
 class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **options):
-        self.stdout.write("Poblando la base de datos de Librería El Faro...")
+        self.stdout.write("Poblando la base de datos de Librería Universo...")
 
         generos = self._crear_generos()
         total_usuarios = self._crear_usuarios()
@@ -61,21 +61,21 @@ class Command(BaseCommand):
         datos = (
             {
                 "username": "admin",
-                "email": "admin@elfaro.cl",
+                "email": "admin@libreriauniverso.cl",
                 "password": "Admin12345!",
                 "first_name": "Administrador",
-                "last_name": "El Faro",
+                "last_name": "Universo",
                 "is_staff": True,
                 "is_superuser": True,
                 "rut": "11.111.111-1",
                 "telefono": "+56 9 1111 1111",
                 "rol": PerfilUsuario.Rol.ADMINISTRADOR,
-                "comuna": "Valparaíso",
-                "direccion": "Cerro Alegre 123",
+                "comuna": "Parral",
+                "direccion": "Aníbal Pinto 585",
             },
             {
                 "username": "cliente",
-                "email": "cliente@correo.cl",
+                "email": "cliente@libreriauniverso.cl",
                 "password": "Cliente12345!",
                 "first_name": "Camila",
                 "last_name": "Pérez",

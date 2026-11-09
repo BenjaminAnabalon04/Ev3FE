@@ -1,4 +1,4 @@
-# Nombre de la Organización: Librería El Faro
+# Nombre de la Organización: Libreria Universo Parral
 # Modelo de Negocio / Giro: Librería independiente con catálogo online, venta de libros,
 # reserva de ejemplares, retiro en tienda y despacho a todo Chile.
 # Integrantes del Equipo: [Benjamin Anabalon - 21.715.412-K] 

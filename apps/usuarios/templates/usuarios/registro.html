@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Registrarse | Librería Universo{% endblock %}
+{% block description %}Crea tu cuenta en Librería Universo.{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container">
+        <div class="auth-card auth-card-wide">
+            <span class="eyebrow">Mi cuenta</span>
+            <h1>Crea tu cuenta</h1>
+            <p class="auth-intro">Completa tus datos para registrarte en Librería Universo.</p>
+
+            <form method="post" action="{% url 'usuarios:registro' %}">
+                {% csrf_token %}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="id_first_name" class="form-label">Nombre</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="id_first_name"
+                            name="first_name"
+                            placeholder="Tu nombre"
+                            autocomplete="given-name"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_telefono" class="form-label">Teléfono</label>
+                        <input
+                            type="tel"
+                            class="form-control"
+                            id="id_telefono"
+                            name="telefono"
+                            placeholder="+56 9 1234 5678"
+                            autocomplete="tel"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_email" class="form-label">Correo electrónico</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="id_email"
+                            name="email"
+                            placeholder="tu@correo.cl"
+                            autocomplete="email"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_username" class="form-label">Nombre de usuario</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="id_username"
+                            name="username"
+                            placeholder="Elige un nombre de usuario"
+                            autocomplete="username"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_comuna" class="form-label">Comuna</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="id_comuna"
+                            name="comuna"
+                            placeholder="Parral"
+                            autocomplete="address-level2"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_direccion" class="form-label">Dirección</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="id_direccion"
+                            name="direccion"
+                            placeholder="Calle y número"
+                            autocomplete="street-address"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_password1" class="form-label">Contraseña</label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="id_password1"
+                            name="password1"
+                            placeholder="Crea una contraseña"
+                            autocomplete="new-password"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_password2" class="form-label">Confirmar contraseña</label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="id_password2"
+                            name="password2"
+                            placeholder="Repite tu contraseña"
+                            autocomplete="new-password"
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-brand auth-submit mt-4">Registrarse</button>
+            </form>
+
+            <p class="auth-footer mb-0">
+                ¿Ya tienes una cuenta?
+                <a class="auth-link" href="{% url 'usuarios:login' %}">Inicia sesión</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

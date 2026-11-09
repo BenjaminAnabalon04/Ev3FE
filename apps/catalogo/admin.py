@@ -3,8 +3,8 @@ from django.contrib import admin
 from .models import GeneroLiterario, Libro
 
 
-admin.site.site_header = "Librería El Faro - Panel de Administración"
-admin.site.site_title = "Librería El Faro Admin"
+admin.site.site_header = "Librería Universo - Panel de Administración"
+admin.site.site_title = "Librería Universo Admin"
 admin.site.index_title = "Gestión del Catálogo e Inventario"
 
 @admin.register(GeneroLiterario)
