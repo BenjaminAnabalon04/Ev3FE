@@ -8,4 +8,9 @@
 # de stock, cálculo de subtotal, IVA 19%, costo de envío y comprobante simulado.
 
 
-# Django Admin: http://127.0.0.1:8000/admin/ (Usuario: Admin123 / Clave: admin123)
+# Django Admin: http://127.0.0.1:8000/admin/ (Usuario: admin / Clave: Admin12345!)
+# Cliente de prueba: cliente / Cliente12345!
+
+# Comando para poblar base de datos
+
+# .\.venv\Scripts\python.exe manage.py poblar_datos
