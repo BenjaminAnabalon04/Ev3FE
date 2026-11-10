@@ -100,11 +100,9 @@
                                 <span class="badge text-bg-danger">{{ libro.get_estado_display }}</span>
                                 {% endif %}
                             </div>
-
-                            {# Cuando exista la página de detalle, reemplaza este botón por un enlace. #}
-                            <button type="button" class="btn btn-brand w-100 mt-3" disabled>
+                                <a class="btn btn-brand w-100 mt-3" href="{% url 'catalogo:detalle' libro.slug %}">
                                 Ver libro
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </article>

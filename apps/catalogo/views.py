@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from .models import GeneroLiterario, Libro
 
@@ -66,3 +66,29 @@ def lista_libros(request):
     }
 
     return render(request, "catalogo/lista.html", contexto)
+
+def detalle_libro(request, slug):
+    libro = get_object_or_404(
+        Libro.objects.select_related("genero"),
+        slug=slug,
+        activo=True,
+    )
+
+    libros_relacionados = (
+        Libro.objects.filter(
+            activo=True,
+            genero=libro.genero,
+        )
+        .exclude(pk=libro.pk)
+        .select_related("genero")
+        .order_by("-destacado", "-fecha_creacion")[:5]
+    )
+
+    return render(
+        request,
+        "catalogo/detalle.html",
+        {
+            "libro": libro,
+            "libros_relacionados": libros_relacionados,
+        },
+    )

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}{{ libro.titulo }} | Librería Universo{% endblock %}
+{% block description %}{{ libro.sinopsis|truncatewords:25 }}{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+
+        <nav class="book-detail-breadcrumb mb-4" aria-label="Ruta de navegación">
+            <a href="{% url 'catalogo:lista' %}">Catálogo</a>
+            <span aria-hidden="true">/</span>
+            <span>{{ libro.titulo }}</span>
+        </nav>
+
+        <div class="row g-4 g-lg-5 align-items-start">
+
+            <!-- Portada -->
+            <div class="col-md-6 col-lg-5">
+                <div class="book-detail-cover-wrap">
+                    {% if libro.portada %}
+                    <img
+                        class="book-detail-cover"
+                        src="{{ libro.portada.url }}"
+                        alt="Portada de {{ libro.titulo }}"
+                    >
+                    {% else %}
+                    <div class="book-detail-cover book-cover-placeholder">
+                        <strong>{{ libro.titulo }}</strong>
+                        <small>{{ libro.autor }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Información del libro -->
+            <div class="col-md-6 col-lg-7">
+                <span class="book-genre">{{ libro.genero.nombre }}</span>
+
+                <h1 class="book-detail-title">{{ libro.titulo }}</h1>
+                <p class="book-detail-author">{{ libro.autor }}</p>
+
+                <div class="book-detail-meta">
+                    <span><strong>Año:</strong> {{ libro.anio_publicacion }}</span>
+                    <span><strong>Código:</strong> {{ libro.codigo }}</span>
+                </div>
+
+                <div class="book-detail-synopsis">
+                    <h2>Sinopsis</h2>
+                    <div class="book-detail-description">
+                        {{ libro.sinopsis|linebreaks }}
+                    </div>
+                </div>
+
+                <div class="book-detail-buy">
+                    <div>
+                        <span class="book-detail-price-label">Precio</span>
+                        <span class="book-price book-detail-price">
+                            {{ libro.precio_formateado }}
+                        </span>
+                    </div>
+
+                    {% if libro.estado == "disponible" %}
+                    <span class="badge text-bg-success">{{ libro.get_estado_display }}</span>
+                    {% elif libro.estado == "preventa" %}
+                    <span class="badge text-bg-warning">{{ libro.get_estado_display }}</span>
+                    {% elif libro.estado == "agotado" %}
+                    <span class="badge text-bg-secondary">{{ libro.get_estado_display }}</span>
+                    {% else %}
+                    <span class="badge text-bg-danger">{{ libro.get_estado_display }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="book-detail-actions">
+                    <button
+                        type="button"
+                        class="btn btn-brand book-detail-cart"
+                        data-libro-id="{{ libro.pk }}"
+                        disabled
+                    >
+                        Agregar al carrito
+                    </button>
+                </div>
+
+                {% if libro.estado == "disponible" or libro.estado == "preventa" %}
+                <p class="book-detail-note">
+                    El carrito de compras estará disponible próximamente.
+                </p>
+                {% else %}
+                <p class="book-detail-note">
+                    Este título no está disponible actualmente.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if libros_relacionados %}
+        <div class="related-books">
+            <div class="related-books-heading">
+                <span class="eyebrow">Seguir leyendo</span>
+                <h2>También te puede interesar</h2>
+            </div>
+
+            <div class="row row-cols-2 row-cols-md-3 row-cols-xl-5 g-3">
+                {% for relacionado in libros_relacionados %}
+                <div class="col">
+                    <article class="card book-card h-100">
+                        {% if relacionado.portada %}
+                        <img
+                            class="card-img-top book-cover"
+                            src="{{ relacionado.portada.url }}"
+                            alt="Portada de {{ relacionado.titulo }}"
+                        >
+                        {% else %}
+                        <div class="card-img-top book-cover book-cover-placeholder">
+                            <strong>{{ relacionado.titulo }}</strong>
+                            <small>{{ relacionado.autor }}</small>
+                        </div>
+                        {% endif %}
+
+                        <div class="card-body book-body d-flex flex-column">
+                            <span class="book-genre">{{ relacionado.genero.nombre }}</span>
+                            <h3 class="book-title">{{ relacionado.titulo }}</h3>
+                            <p class="book-author">{{ relacionado.autor }}</p>
+
+                            <div class="mt-auto">
+                                <div class="book-footer">
+                                    <span class="book-price">{{ relacionado.precio_formateado }}</span>
+                                </div>
+
+                                <a
+                                    class="btn btn-brand w-100 mt-3"
+                                    href="{% url 'catalogo:detalle' relacionado.slug %}"
+                                >
+                                    Ver libro
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-4">
+                <a
+                    class="btn btn-outline-brand"
+                    href="{% url 'catalogo:lista' %}?genero={{ libro.genero.slug }}"
+                >
+                    Ver todos los libros de {{ libro.genero.nombre }}
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
