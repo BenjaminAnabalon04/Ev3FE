@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Inicio | Librería Universo{% endblock %}
+{% block description %}Librería Universo, tradición y cultura desde 1928 en Parral, Chile. Libros, reservas y retiro en tienda.{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <span class="eyebrow">Librería independiente · Parral, Chile</span>
+                <h1 class="hero-title">Historias que abren mundos</h1>
+                <span class="hero-script">desde 1928</span>
+                <p class="hero-text">
+                    Un rincón para leer, descubrir y compartir historias.
+                    En Librería Universo creemos que cada libro es una puerta a un mundo nuevo.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn-brand" href="#libros">
+                        Explorar catálogo
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14"></path>
+                            <path d="m13 6 6 6-6 6"></path>
+                        </svg>
+                    </a>
+                    <a class="btn-outline-brand" href="#historia">Nuestra historia</a>
+                </div>
+                <p class="hero-location">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11z"></path>
+                        <circle cx="12" cy="10" r="2.5"></circle>
+                    </svg>
+                    Tradición y cultura en el corazón de Parral.
+                </p>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-logo-wrap">
+                    <div class="hero-ring" aria-hidden="true"></div>
+                    <img class="hero-logo" src="{% static 'images/logo.png' %}" alt="Sello de Librería Universo">
+                    <div class="hero-quote">
+                        <p>“Leer es viajar sin moverse.”</p>
+                        <span>Librería Universo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="benefits" aria-label="Beneficios de comprar en Librería Universo">
+    <div class="container">
+        <h2 class="visually-hidden">Beneficios de comprar en Librería Universo</h2>
+        <div class="benefits-grid">
+            <div class="benefit">
+                <span class="benefit-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                </span>
+                <div>
+                    <h3>Selección cuidada</h3>
+                    <p>Libros elegidos con atención para todos los gustos y edades.</p>
+                </div>
+            </div>
+
+            <div class="benefit">
+                <span class="benefit-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 9l1.5-6h15L21 9"></path>
+                        <path d="M4 9v11h16V9"></path>
+                        <path d="M9 20v-6h6v6"></path>
+                    </svg>
+                </span>
+                <div>
+                    <h3>Retiro en tienda</h3>
+                    <p>Reserva tus ejemplares y retíralos directamente en Parral.</p>
+                </div>
+            </div>
+
+            <div class="benefit">
+                <span class="benefit-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
+                    </svg>
+                </span>
+                <div>
+                    <h3>Atención cercana</h3>
+                    <p>Te ayudamos a encontrar ese libro que estás buscando.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="historia" class="section">
+    <div class="container">
+        <div class="history-card">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-4 text-center">
+                    <img class="history-logo" src="{% static 'images/logo.png' %}" alt="Logo de Librería Universo">
+                </div>
+                <div class="col-lg-8">
+                    <span class="eyebrow">Nuestra historia</span>
+                    <h2>Tradición y cultura desde 1928</h2>
+                    <p>
+                        Librería Universo es un espacio independiente en el corazón de Parral.
+                        Desde 1928 hemos acompañado a generaciones de lectores, guardando historias,
+                        recomendando libros y creyendo que la lectura abre caminos.
+                    </p>
+                    <p>
+                        Hoy seguimos con la misma idea: que cada página sea una puerta a nuevos mundos.
+                    </p>
+                    <div class="history-data">
+                        <div>
+                            <strong>1928</strong>
+                            <span>Nuestro comienzo</span>
+                        </div>
+                        <div>
+                            <strong>Parral</strong>
+                            <span>Aníbal Pinto 585</span>
+                        </div>
+                        <div>
+                            <strong>+90 años</strong>
+                            <span>Compartiendo lecturas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="libros" class="section">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">Catálogo</span>
+            <h2>Libros destacados</h2>
+            <p>Una pequeña selección de los títulos que tenemos disponibles en la librería.</p>
+        </div>
+
+        <div class="row g-4">
+            {% for libro in libros_destacados %}
+            <div class="col-md-6 col-lg-4">
+                <article class="book-card">
+                    {% if libro.portada %}
+                    <img class="book-cover" src="{{ libro.portada.url }}" alt="Portada de {{ libro.titulo }}">
+                    {% else %}
+                    <div class="book-cover book-cover-placeholder">
+                        <strong>{{ libro.titulo }}</strong>
+                        <small>{{ libro.autor }}</small>
+                    </div>
+                    {% endif %}
+
+                    <div class="book-body">
+                        <span class="book-genre">{{ libro.genero.nombre }}</span>
+                        <h3>{{ libro.titulo }}</h3>
+                        <p class="book-author">{{ libro.autor }}</p>
+                        <div class="book-footer">
+                            <span class="book-price">{{ libro.precio_formateado }}</span>
+                            {% if libro.en_stock %}
+                            <span class="badge text-bg-success">Disponible</span>
+                            {% else %}
+                            <span class="badge text-bg-secondary">{{ libro.get_estado_display }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-muted">Todavía no hay libros destacados. Puedes agregarlos desde el administrador.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

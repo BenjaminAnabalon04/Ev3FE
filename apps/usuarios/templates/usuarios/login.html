@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar sesión | Librería Universo{% endblock %}
+{% block description %}Ingresa a tu cuenta de Librería Universo.{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="container">
+        <div class="auth-card">
+            <span class="eyebrow">Mi cuenta</span>
+            <h1>Bienvenido de vuelta</h1>
+            <p class="auth-intro">Ingresa tus datos para acceder a tu cuenta.</p>
+
+            <form method="post" action="{% url 'usuarios:login' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                {{ form.non_field_errors }}
+
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    {% endfor %}
+
+                <div class="mb-3">
+                    <label for="id_email" class="form-label">Correo electrónico</label>
+                    <input
+                        type="email"
+                        class="form-control"
+                        id="id_email"
+                        name="email"
+                        value="{{ form.email.value|default:'' }}"
+                        placeholder="tu@correo.cl"
+                        autocomplete="email"
+                        inputmode="email"
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_password" class="form-label">Contraseña</label>
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="id_password"
+                        name="password"
+                        placeholder="Tu contraseña"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <div class="auth-options">
+                    <a class="auth-link" href="{% url 'usuarios:registro' %}">¿No tienes cuenta? Registrate</a>
+                    <a class="auth-link" href="mailto:libuniverso1928@gmail.com?subject=Recuperar%20contrase%C3%B1a">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+
+                <button type="submit" class="btn-brand auth-submit">Iniciar sesión</button>
+
+            </form>
+                
+           
+
+            <p class="auth-footer mb-0">
+                <a class="auth-link" href="{% url 'core:inicio' %}">Volver al inicio</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}
