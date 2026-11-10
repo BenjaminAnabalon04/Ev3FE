@@ -127,7 +127,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_URL = 'usuarios:login'
-LOGIN_REDIRECT_URL = 'catalogo:lista'
+LOGIN_REDIRECT_URL = 'core:inicio'
 LOGOUT_REDIRECT_URL = 'core:inicio'
 
 MESSAGE_TAGS = {

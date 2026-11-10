@@ -52,12 +52,27 @@
                             <path d="m20 20-3.5-3.5"></path>
                         </svg>
                     </a>
+
+                    {% if user.is_authenticated %}
+                    <span class="header-user">Hola, {{ user.first_name|default:user.username }}</span>
+
+                    {% if user.is_staff %}
+                    <a class="header-panel" href="{% url 'admin:index' %}">Panel</a>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'usuarios:logout' %}" class="header-logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="header-logout">Cerrar sesión</button>
+                    </form>
+                    {% else %}
                     <a href="{% url 'usuarios:login' %}" aria-label="Iniciar sesión">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
                             <circle cx="12" cy="8" r="4"></circle>
                             <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"></path>
                         </svg>
                     </a>
+                    {% endif %}
+
                     <a href="#" aria-label="Carrito (próximamente)">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M6 6h15l-1.5 9h-12z"></path>
@@ -72,9 +87,9 @@
     </header>
 
     {% if messages %}
-    <div class="container mt-3">
+    <div class="container site-messages mt-3">
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags|default:'info' }} mb-2" role="alert">
+        <div class="site-alert site-alert-{{ message.tags|default:'info' }}" role="alert">
             {{ message }}
         </div>
         {% endfor %}
@@ -84,6 +99,7 @@
     <main id="contenido" class="flex-grow-1">
         {% block content %}{% endblock %}
     </main>
+    
 
     <footer id="contacto" class="site-footer">
         <div class="container">
