@@ -58,7 +58,7 @@ Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
 
 ## Credenciales de prueba
 
-| Rol | Email| Clave | Acceso |
+| Rol | Email| Clave |
 |---|---|---|---|
 | Administrador | `admin@libreriauniverso.cl` | `Admin12345!` | http://127.0.0.1:8000/admin/ |
 | Cliente | `cliente@libreriauniverso.cl` | `Cliente12345!` | Sitio público |

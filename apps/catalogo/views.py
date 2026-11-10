@@ -1,8 +1,5 @@
-from functools import wraps
-
 from django.contrib import messages
-from django.contrib.auth.views import redirect_to_login
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -115,21 +112,12 @@ def es_administrador(user):
     return perfil is not None and perfil.rol == PerfilUsuario.Rol.ADMINISTRADOR
 
 
-def solo_administrador(vista):
-    @wraps(vista)
-    def envoltura(request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect_to_login(request.get_full_path())
-
-        if not es_administrador(request.user):
-            raise PermissionDenied
-
-        return vista(request, *args, **kwargs)
-
-    return envoltura
+def puede_gestionar(user):
+    return user.is_staff and es_administrador(user)
 
 
-@solo_administrador
+@login_required
+@user_passes_test(puede_gestionar)
 def crear_libro(request):
     form = LibroForm(request.POST or None, request.FILES or None)
 
@@ -152,7 +140,8 @@ def crear_libro(request):
     )
 
 
-@solo_administrador
+@login_required
+@user_passes_test(puede_gestionar)
 def crear_genero(request):
     form = GeneroForm(request.POST or None)
 
@@ -171,7 +160,8 @@ def crear_genero(request):
     )
 
 
-@solo_administrador
+@login_required
+@user_passes_test(puede_gestionar)
 def editar_libro(request, slug):
     libro = get_object_or_404(Libro, slug=slug)
     form = LibroForm(
@@ -202,7 +192,8 @@ def editar_libro(request, slug):
     )
 
 
-@solo_administrador
+@login_required
+@user_passes_test(puede_gestionar)
 def lista_generos(request):
     generos = (
         GeneroLiterario.objects.annotate(libros_count=Count("libros"))
@@ -216,7 +207,8 @@ def lista_generos(request):
     )
 
 
-@solo_administrador
+@login_required
+@user_passes_test(puede_gestionar)
 def editar_genero(request, pk):
     genero = get_object_or_404(GeneroLiterario, pk=pk)
     form = GeneroForm(request.POST or None, instance=genero)
