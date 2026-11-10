@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if form.instance.pk %}Editar género{% else %}Nuevo género{% endif %} | Librería Universo
+{% endblock %}
+{% block description %}Gestiona los géneros literarios de Librería Universo.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <nav class="book-detail-breadcrumb mb-4" aria-label="Ruta de navegación">
+            <a href="{% url 'catalogo:lista' %}">Catálogo</a>
+            <span aria-hidden="true">/</span>
+            <span>{% if form.instance.pk %}Editar género{% else %}Nuevo género{% endif %}</span>
+        </nav>
+
+        <div class="admin-form-card admin-form-card-small">
+            <span class="eyebrow">Administración</span>
+            <h1>{% if form.instance.pk %}Editar género{% else %}Nuevo género{% endif %}</h1>
+            <p class="admin-form-intro">
+                El slug se genera automáticamente a partir del nombre.
+            </p>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="site-alert site-alert-danger" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="row g-3">
+                    {% include "catalogo/gestion/_campo.html" with campo=form.nombre col="col-12" %}
+                    {% include "catalogo/gestion/_campo.html" with campo=form.descripcion col="col-12" %}
+                </div>
+
+                <div class="admin-form-checks">
+                    <div class="form-check form-switch">
+                        {{ form.activo }}
+                        <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                            {{ form.activo.label }}
+                        </label>
+                        {% for error in form.activo.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn btn-brand">
+                        {% if form.instance.pk %}Guardar cambios{% else %}Guardar género{% endif %}
+                    </button>
+                    {% if form.instance.pk %}
+                    <a href="{% url 'catalogo:lista_generos' %}" class="btn btn-outline-brand">
+                        Cancelar
+                    </a>
+                    {% else %}
+                    <a href="{% url 'catalogo:lista' %}" class="btn btn-outline-brand">
+                        Cancelar
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

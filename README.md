@@ -77,7 +77,9 @@ Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
 
 | Caso | Tema | Estado |
 |---|---|---|
-| 1 | Registro y login con validaciones | Completado |
+| 1 | Registro y login con validaciones | 
+| 2 | Catalogo | 
+
 
 ## Caso 1: Registro y login con validaciones
 

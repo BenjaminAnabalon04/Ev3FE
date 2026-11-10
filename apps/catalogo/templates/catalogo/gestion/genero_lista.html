@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Gestionar géneros | Librería Universo{% endblock %}
+{% block description %}Administra los géneros literarios de Librería Universo.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <nav class="book-detail-breadcrumb mb-4" aria-label="Ruta de navegación">
+            <a href="{% url 'catalogo:lista' %}">Catálogo</a>
+            <span aria-hidden="true">/</span>
+            <span>Gestionar géneros</span>
+        </nav>
+
+        <div class="catalog-heading-row">
+            <div class="section-heading">
+                <span class="eyebrow">Administración</span>
+                <h1>Gestión de géneros</h1>
+                <p>Revisa y edita los géneros literarios del catálogo.</p>
+            </div>
+
+            <div class="catalog-admin-actions">
+                <a class="btn btn-brand" href="{% url 'catalogo:crear_genero' %}">
+                    Nuevo género
+                </a>
+                <a class="btn btn-outline-brand" href="{% url 'catalogo:lista' %}">
+                    Volver al catálogo
+                </a>
+            </div>
+        </div>
+
+        <div class="admin-table-card">
+            <div class="table-responsive">
+                <table class="table admin-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Género</th>
+                            <th scope="col">Slug</th>
+                            <th scope="col">Libros</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col" class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for genero in generos %}
+                        <tr>
+                            <td>
+                                <strong>{{ genero.nombre }}</strong>
+                                {% if genero.descripcion %}
+                                <div class="admin-table-description">
+                                    {{ genero.descripcion|truncatewords:14 }}
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td><code>{{ genero.slug }}</code></td>
+                            <td>{{ genero.libros_count }}</td>
+                            <td>
+                                {% if genero.activo %}
+                                <span class="badge text-bg-success">Activo</span>
+                                {% else %}
+                                <span class="badge text-bg-secondary">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a
+                                    class="btn btn-outline-brand btn-sm"
+                                    href="{% url 'catalogo:editar_genero' genero.pk %}"
+                                >
+                                    Editar
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                Todavía no hay géneros creados.
+                                <a href="{% url 'catalogo:crear_genero' %}">Crea el primero</a>.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

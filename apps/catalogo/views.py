@@ -1,7 +1,15 @@
-from django.core.paginator import Paginator
-from django.db.models import Q
-from django.shortcuts import get_object_or_404, render
+from functools import wraps
 
+from django.contrib import messages
+from django.contrib.auth.views import redirect_to_login
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, redirect, render
+
+from apps.usuarios.models import PerfilUsuario
+
+from .forms import GeneroForm, LibroForm
 from .models import GeneroLiterario, Libro
 
 # valor que recibe el select -> (campo real de orden, etiqueta visible)
@@ -63,6 +71,7 @@ def lista_libros(request):
             (clave, etiqueta)
             for clave, (_, etiqueta) in ORDENES.items()
         ],
+        "es_administrador": es_administrador(request.user),
     }
 
     return render(request, "catalogo/lista.html", contexto)
@@ -90,5 +99,141 @@ def detalle_libro(request, slug):
         {
             "libro": libro,
             "libros_relacionados": libros_relacionados,
+            "es_administrador": es_administrador(request.user),
+        },
+    )
+
+
+def es_administrador(user):
+    if not user.is_authenticated:
+        return False
+
+    if user.is_superuser:
+        return True
+
+    perfil = getattr(user, "perfil", None)
+    return perfil is not None and perfil.rol == PerfilUsuario.Rol.ADMINISTRADOR
+
+
+def solo_administrador(vista):
+    @wraps(vista)
+    def envoltura(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect_to_login(request.get_full_path())
+
+        if not es_administrador(request.user):
+            raise PermissionDenied
+
+        return vista(request, *args, **kwargs)
+
+    return envoltura
+
+
+@solo_administrador
+def crear_libro(request):
+    form = LibroForm(request.POST or None, request.FILES or None)
+
+    if request.method == "POST" and form.is_valid():
+        libro = form.save()
+        messages.success(
+            request,
+            f'El libro "{libro.titulo}" fue creado correctamente.',
+        )
+
+        if libro.activo:
+            return redirect("catalogo:detalle", slug=libro.slug)
+
+        return redirect("catalogo:lista")
+
+    return render(
+        request,
+        "catalogo/gestion/libro_form.html",
+        {"form": form},
+    )
+
+
+@solo_administrador
+def crear_genero(request):
+    form = GeneroForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        genero = form.save()
+        messages.success(
+            request,
+            f'El género "{genero.nombre}" fue creado correctamente.',
+        )
+        return redirect("catalogo:lista")
+
+    return render(
+        request,
+        "catalogo/gestion/genero_form.html",
+        {"form": form},
+    )
+
+
+@solo_administrador
+def editar_libro(request, slug):
+    libro = get_object_or_404(Libro, slug=slug)
+    form = LibroForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=libro,
+    )
+
+    if request.method == "POST" and form.is_valid():
+        libro = form.save()
+        messages.success(
+            request,
+            f'El libro "{libro.titulo}" fue actualizado correctamente.',
+        )
+
+        if libro.activo:
+            return redirect("catalogo:detalle", slug=libro.slug)
+
+        return redirect("catalogo:lista")
+
+    return render(
+        request,
+        "catalogo/gestion/libro_form.html",
+        {
+            "form": form,
+            "libro": libro,
+        },
+    )
+
+
+@solo_administrador
+def lista_generos(request):
+    generos = (
+        GeneroLiterario.objects.annotate(libros_count=Count("libros"))
+        .order_by("nombre")
+    )
+
+    return render(
+        request,
+        "catalogo/gestion/genero_lista.html",
+        {"generos": generos},
+    )
+
+
+@solo_administrador
+def editar_genero(request, pk):
+    genero = get_object_or_404(GeneroLiterario, pk=pk)
+    form = GeneroForm(request.POST or None, instance=genero)
+
+    if request.method == "POST" and form.is_valid():
+        genero = form.save()
+        messages.success(
+            request,
+            f'El género "{genero.nombre}" fue actualizado correctamente.',
+        )
+        return redirect("catalogo:lista_generos")
+
+    return render(
+        request,
+        "catalogo/gestion/genero_form.html",
+        {
+            "form": form,
+            "genero": genero,
         },
     )

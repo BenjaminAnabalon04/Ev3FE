@@ -6,10 +6,28 @@
 {% block content %}
 <section class="section">
     <div class="container">
-        <div class="section-heading">
-            <span class="eyebrow">Catálogo</span>
-            <h1>Nuestros libros</h1>
-            <p>Busca por título, código, autor o descripción, y filtra por género.</p>
+        <div class="catalog-heading-row">
+            <div class="section-heading">
+                <span class="eyebrow">Catálogo</span>
+                <h1>Nuestros libros</h1>
+                <p>Busca por título, código, autor o descripción, y filtra por género.</p>
+            </div>
+
+            {% if es_administrador %}
+            <div class="catalog-admin-actions">
+                <details class="admin-create-menu">
+                    <summary class="btn btn-brand">CREAR</summary>
+                    <div class="admin-create-menu-panel">
+                        <a href="{% url 'catalogo:crear_libro' %}">Nuevo libro</a>
+                        <a href="{% url 'catalogo:crear_genero' %}">Nuevo género</a>
+                    </div>
+                </details>
+
+                <a class="btn btn-outline-brand" href="{% url 'catalogo:lista_generos' %}">
+                    Gestionar géneros
+                </a>
+            </div>
+            {% endif %}
         </div>
 
         <form method="get" action="{% url 'catalogo:lista' %}" class="catalog-filters row g-3 align-items-end mb-4">

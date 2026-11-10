@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if form.instance.pk %}Editar libro{% else %}Nuevo libro{% endif %} | Librería Universo
+{% endblock %}
+{% block description %}Gestiona la información de un libro en Librería Universo.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <nav class="book-detail-breadcrumb mb-4" aria-label="Ruta de navegación">
+            <a href="{% url 'catalogo:lista' %}">Catálogo</a>
+            <span aria-hidden="true">/</span>
+            <span>{% if form.instance.pk %}Editar libro{% else %}Nuevo libro{% endif %}</span>
+        </nav>
+
+        <div class="admin-form-card">
+            <span class="eyebrow">Administración</span>
+            <h1>{% if form.instance.pk %}Editar libro{% else %}Nuevo libro{% endif %}</h1>
+            <p class="admin-form-intro">
+                {% if form.instance.pk %}
+                Modifica los datos del libro y guarda los cambios.
+                {% else %}
+                Completa los datos del libro. Los campos con <span class="text-danger">*</span>
+                son obligatorios.
+                {% endif %}
+            </p>
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="site-alert site-alert-danger" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="row g-3">
+                    {% include "catalogo/gestion/_campo.html" with campo=form.codigo col="col-md-4" %}
+                    {% include "catalogo/gestion/_campo.html" with campo=form.genero col="col-md-4" %}
+                    {% include "catalogo/gestion/_campo.html" with campo=form.estado col="col-md-4" %}
+
+                    {% include "catalogo/gestion/_campo.html" with campo=form.titulo col="col-md-8" %}
+                    {% include "catalogo/gestion/_campo.html" with campo=form.autor col="col-md-4" %}
+
+                    {% include "catalogo/gestion/_campo.html" with campo=form.editorial col="col-md-6" %}
+                    {% include "catalogo/gestion/_campo.html" with campo=form.anio_publicacion col="col-md-3" %}
+                    {% include "catalogo/gestion/_campo.html" with campo=form.precio col="col-md-3" %}
+
+                    {% include "catalogo/gestion/_campo.html" with campo=form.stock col="col-md-3" %}
+                    {% include "catalogo/gestion/_campo.html" with campo=form.portada col="col-md-9" %}
+
+                    {% include "catalogo/gestion/_campo.html" with campo=form.sinopsis col="col-12" %}
+                </div>
+
+                <div class="admin-form-checks">
+                    <div class="form-check form-switch">
+                        {{ form.destacado }}
+                        <label class="form-check-label" for="{{ form.destacado.id_for_label }}">
+                            {{ form.destacado.label }}
+                        </label>
+                        {% for error in form.destacado.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-check form-switch">
+                        {{ form.activo }}
+                        <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                            {{ form.activo.label }}
+                        </label>
+                        {% for error in form.activo.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="admin-form-actions">
+                    <button type="submit" class="btn btn-brand">
+                        {% if form.instance.pk %}Guardar cambios{% else %}Guardar libro{% endif %}
+                    </button>
+                    <a href="{% url 'catalogo:lista' %}" class="btn btn-outline-brand">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1212,12 +1212,15 @@ a:hover {
 }
 
 .book-detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     margin-top: 1.2rem;
 }
 
 .book-detail-actions .btn {
+    flex: 1 1 12rem;
     justify-content: center;
-    width: 100%;
 }
 
 .book-detail-cart:disabled {
@@ -1230,4 +1233,241 @@ a:hover {
     font-size: 0.85rem;
     margin-top: 0.6rem;
     text-align: center;
+}
+
+/* Gestión del catálogo */
+.catalog-heading-row {
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.catalog-heading-row .section-heading {
+    margin-bottom: 0;
+}
+
+.catalog-admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.admin-create-menu {
+    position: relative;
+}
+
+.admin-create-menu summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.admin-create-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.admin-create-menu summary:focus-visible {
+    outline: 2px solid var(--dorado);
+    outline-offset: 2px;
+}
+
+.admin-create-menu-panel {
+    background: var(--papel);
+    border: 1px solid var(--borde);
+    border-radius: 0.7rem;
+    box-shadow: 0 14px 30px rgba(58, 7, 18, 0.14);
+    min-width: 11rem;
+    padding: 0.4rem;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.45rem);
+    z-index: 10;
+}
+
+.admin-create-menu-panel a {
+    border-radius: 0.45rem;
+    color: var(--vino);
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.55rem 0.75rem;
+    text-decoration: none;
+}
+
+.admin-create-menu-panel a:hover {
+    background: var(--crema-2);
+}
+
+.admin-form-card {
+    background: var(--papel);
+    border: 1px solid var(--borde);
+    border-radius: 1.2rem;
+    box-shadow: 0 18px 40px rgba(58, 7, 18, 0.07);
+    margin: 0 auto;
+    max-width: 980px;
+    padding: 2rem;
+}
+
+.admin-form-card-small {
+    max-width: 680px;
+}
+
+.admin-form-card h1 {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 900;
+    margin-bottom: 0.4rem;
+}
+
+.admin-form-intro {
+    color: var(--marron);
+    margin-bottom: 1.5rem;
+}
+
+.admin-form-card .form-label {
+    color: var(--vino);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.admin-form-card .form-control,
+.admin-form-card .form-select {
+    border-color: var(--borde);
+    border-radius: 0.6rem;
+    color: var(--tinta);
+}
+
+.admin-form-card .form-control:focus,
+.admin-form-card .form-select:focus {
+    border-color: var(--vino);
+    box-shadow: 0 0 0 0.2rem rgba(90, 11, 30, 0.12);
+}
+
+.admin-form-card .form-text {
+    color: var(--marron);
+}
+
+.admin-form-card .form-check-input:checked {
+    background-color: var(--vino);
+    border-color: var(--vino);
+}
+
+.admin-form-card .form-check-input:focus {
+    border-color: var(--vino);
+    box-shadow: 0 0 0 0.2rem rgba(90, 11, 30, 0.12);
+}
+
+.admin-form-checks {
+    border-top: 1px solid var(--borde);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1.2rem;
+}
+
+.admin-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 575.98px) {
+    .catalog-heading-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-create-menu,
+    .admin-create-menu summary {
+        width: 100%;
+    }
+
+    .admin-create-menu summary {
+        justify-content: center;
+    }
+
+    .admin-create-menu-panel {
+        left: 0;
+        min-width: 100%;
+        right: auto;
+    }
+
+    .admin-form-card {
+        padding: 1.4rem;
+    }
+
+    .admin-form-actions .btn {
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+/* Lista de géneros */
+.admin-table-card {
+    background: var(--papel);
+    border: 1px solid var(--borde);
+    border-radius: 1rem;
+    box-shadow: 0 14px 32px rgba(58, 7, 18, 0.06);
+    overflow: hidden;
+}
+
+.admin-table {
+    margin: 0;
+}
+
+.admin-table thead th {
+    background: var(--crema-2);
+    border-bottom: 1px solid var(--borde);
+    color: var(--vino);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.9rem 1rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.admin-table tbody td {
+    border-color: var(--borde);
+    color: var(--tinta);
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.admin-table code {
+    background: var(--crema-2);
+    border-radius: 0.35rem;
+    color: var(--marron);
+    font-size: 0.8rem;
+    padding: 0.2rem 0.4rem;
+}
+
+.admin-table-description {
+    color: var(--marron);
+    font-size: 0.82rem;
+    margin-top: 0.2rem;
+    max-width: 26rem;
+}
+
+.admin-table .btn {
+    font-size: 0.78rem;
+    padding: 0.4rem 0.85rem;
+}
+
+@media (max-width: 575.98px) {
+    .catalog-admin-actions {
+        width: 100%;
+    }
+
+    .catalog-admin-actions .btn {
+        flex: 1 1 100%;
+        justify-content: center;
+    }
 }

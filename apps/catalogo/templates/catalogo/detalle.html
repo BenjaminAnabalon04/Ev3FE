@@ -80,6 +80,15 @@
                     >
                         Agregar al carrito
                     </button>
+
+                    {% if es_administrador %}
+                    <a
+                        class="btn btn-outline-brand"
+                        href="{% url 'catalogo:editar_libro' libro.slug %}"
+                    >
+                        Editar libro
+                    </a>
+                    {% endif %}
                 </div>
 
                 {% if libro.estado == "disponible" or libro.estado == "preventa" %}
