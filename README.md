@@ -351,12 +351,9 @@ def logout_view(request):
 ### Adaptación aplicada
 
 - Cambié `required=False` por `required=True` en teléfono, comuna y dirección, porque el requisito del sistema exige esos datos en el registro.
-- Cambié el formato del RUT de `11.111.111-K` a `11111111-K` (sin puntos), para que sea más cómodo de escribir para un usuario nuevo. (COMPLETAR: pega aquí la expresión regular final que quedó en tu código y menciona si actualizaste el mensaje de error y el placeholder.)
-- El resto de la sugerencia técnica se mantuvo sin cambios.
-
+- Cambié el formato del RUT de `11.111.111-K` a `11111111-K` (sin puntos), para que sea más cómodo de escribir para un usuario nuevo.
 ### Verificación
 
 1. Dejé teléfono, comuna y dirección en blanco: el formulario muestra error.
 2. Usé un correo y un usuario ya registrados: el formulario muestra error.
 3. Probé formatos de RUT incorrectos: el formulario muestra error.
-4. (COMPLETAR si lo pruebas) Correo con formato inválido, contraseñas que no coinciden, hash de la contraseña visible en el Admin, inicio de sesión con usuario y con correo.
