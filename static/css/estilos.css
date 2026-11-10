@@ -981,3 +981,59 @@ a:hover {
         transition: none !important;
     }
 }
+/* Catálogo */
+.catalog-filters {
+    background: var(--papel);
+    border: 1px solid var(--borde);
+    border-radius: 1rem;
+    padding: 1.25rem;
+}
+
+.catalog-filters .form-label {
+    color: var(--vino);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+}
+
+.catalog-filters .form-control,
+.catalog-filters .form-select {
+    border-color: var(--borde);
+    border-radius: 0.6rem;
+    color: var(--tinta);
+}
+
+.catalog-filters .form-control:focus,
+.catalog-filters .form-select:focus {
+    border-color: var(--vino);
+    box-shadow: 0 0 0 0.2rem rgba(90, 11, 30, 0.12);
+}
+
+.book-card .card-body {
+    padding: 1.2rem;
+}
+
+.book-card .btn-brand:disabled {
+    opacity: 0.6;
+}
+
+.pagination .page-link {
+    color: var(--vino);
+}
+
+.pagination .page-link:hover {
+    background: var(--crema-2);
+    color: var(--vino-oscuro);
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--vino);
+    border-color: var(--vino);
+    color: var(--crema);
+}
+
+.pagination .page-item.disabled .page-link {
+    color: var(--marron);
+}
