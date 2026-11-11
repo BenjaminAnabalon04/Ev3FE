@@ -118,9 +118,41 @@
                                 <span class="badge text-bg-danger">{{ libro.get_estado_display }}</span>
                                 {% endif %}
                             </div>
-                                <a class="btn btn-brand w-100 mt-3" href="{% url 'catalogo:detalle' libro.slug %}">
-                                Ver libro
-                            </a>
+
+                            {% if es_administrador and not libro.activo %}
+                            <span class="badge text-bg-dark mt-2">Inactivo</span>
+                            {% endif %}
+
+                            <div class="book-card-actions">
+                                {% if libro.activo %}
+                                    {% if libro.estado == "disponible" or libro.estado == "preventa" %}
+                                        {% if libro.stock > 0 %}
+                                        <form method="post" action="{% url 'pedidos:agregar' libro.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-brand w-100">
+                                                Agregar al carrito
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                        <button type="button" class="btn btn-brand w-100" disabled>
+                                            Sin stock
+                                        </button>
+                                        {% endif %}
+                                    {% else %}
+                                    <button type="button" class="btn btn-brand w-100" disabled>
+                                        No disponible
+                                    </button>
+                                    {% endif %}
+                                {% else %}
+                                <button type="button" class="btn btn-brand w-100" disabled>
+                                    Inactivo
+                                </button>
+                                {% endif %}
+
+                                <a class="btn btn-outline-brand w-100" href="{% url 'catalogo:detalle' libro.slug %}">
+                                    Ver libro
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </article>

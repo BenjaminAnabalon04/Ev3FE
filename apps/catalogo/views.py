@@ -29,10 +29,14 @@ def lista_libros(request):
     if orden not in ORDENES:
         orden = ORDEN_POR_DEFECTO
 
-    libros = (
-        Libro.objects.filter(activo=True)
-        .select_related("genero")
-    )
+    es_admin = es_administrador(request.user)
+
+    libros = Libro.objects.select_related("genero")
+
+    # El público solo ve libros activos de géneros activos.
+    # El administrador ve todo el catálogo, incluso lo desactivado.
+    if not es_admin:
+        libros = libros.filter(activo=True, genero__activo=True)
 
     # Buscador multicampo.
     # En tu modelo "descripcion" corresponde al campo "sinopsis".
@@ -53,10 +57,14 @@ def lista_libros(request):
     libros = libros.order_by(campo_orden)
 
     # Paginación: 12 libros por página.
-    paginador = Paginator(libros, 12)
+    paginador = Paginator(libros, 4)
     page_obj = paginador.get_page(request.GET.get("page"))
 
-    generos = GeneroLiterario.objects.filter(activo=True)
+    generos = (
+        GeneroLiterario.objects.all()
+        if es_admin
+        else GeneroLiterario.objects.filter(activo=True)
+    )
 
     contexto = {
         "page_obj": page_obj,
@@ -68,21 +76,29 @@ def lista_libros(request):
             (clave, etiqueta)
             for clave, (_, etiqueta) in ORDENES.items()
         ],
-        "es_administrador": es_administrador(request.user),
+        "es_administrador": es_admin,
     }
 
     return render(request, "catalogo/lista.html", contexto)
 
 def detalle_libro(request, slug):
+    es_admin = es_administrador(request.user)
+
+    filtros = {"slug": slug}
+
+    if not es_admin:
+        filtros["activo"] = True
+        filtros["genero__activo"] = True
+
     libro = get_object_or_404(
         Libro.objects.select_related("genero"),
-        slug=slug,
-        activo=True,
+        **filtros,
     )
 
     libros_relacionados = (
         Libro.objects.filter(
             activo=True,
+            genero__activo=True,
             genero=libro.genero,
         )
         .exclude(pk=libro.pk)
@@ -96,7 +112,7 @@ def detalle_libro(request, slug):
         {
             "libro": libro,
             "libros_relacionados": libros_relacionados,
-            "es_administrador": es_administrador(request.user),
+            "es_administrador": es_admin,
         },
     )
 

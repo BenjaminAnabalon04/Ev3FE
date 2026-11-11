@@ -14,7 +14,7 @@
             <form method="post" action="{% url 'usuarios:registro' %}">
                 {% csrf_token %}
                 {% if form.errors %}
-                    <div class="alert alert-danger">
+                    <div class="site-alert site-alert-danger">
                         <ul class="mb-0">
                             {% for field in form %}
                                 {% for error in field.errors %}
@@ -38,6 +38,7 @@
                             name="first_name"
                             placeholder="Tu nombre"
                             autocomplete="given-name"
+                            value="{% if not form.first_name.errors %}{{ form.first_name.value|default:'' }}{% endif %}"
                         >
                     </div>
                    
@@ -49,7 +50,8 @@
                             id="id_last_name"
                             name="last_name"
                             placeholder="Tu apellido"
-                            autocomplete="given-apellido"
+                            autocomplete="family-name"
+                            value="{% if not form.last_name.errors %}{{ form.last_name.value|default:'' }}{% endif %}"
                         >
                     </div>
                     <div class="col-md-6">
@@ -61,6 +63,7 @@
                             name="rut"
                             placeholder="11123123-0"
                             autocomplete="rut"
+                            value="{% if not form.rut.errors %}{{ form.rut.value|default:'' }}{% endif %}"
                         >
                     </div>
 
@@ -73,6 +76,7 @@
                             name="telefono"
                             placeholder="+56 9 1234 5678"
                             autocomplete="tel"
+                            value="{% if not form.telefono.errors %}{{ form.telefono.value|default:'' }}{% endif %}"
                         >
                     </div>
 
@@ -85,6 +89,7 @@
                             name="email"
                             placeholder="tu@correo.cl"
                             autocomplete="email"
+                            value="{% if not form.email.errors %}{{ form.email.value|default:'' }}{% endif %}"
                         >
                     </div>
 
@@ -97,6 +102,7 @@
                             name="username"
                             placeholder="Elige un nombre de usuario"
                             autocomplete="username"
+                            value="{% if not form.username.errors %}{{ form.username.value|default:'' }}{% endif %}"
                         >
                     </div>
 
@@ -109,6 +115,7 @@
                             name="comuna"
                             placeholder="Parral"
                             autocomplete="address-level2"
+                            value="{% if not form.comuna.errors %}{{ form.comuna.value|default:'' }}{% endif %}"
                         >
                     </div>
 
@@ -121,6 +128,7 @@
                             name="direccion"
                             placeholder="Calle y número"
                             autocomplete="street-address"
+                            value="{% if not form.direccion.errors %}{{ form.direccion.value|default:'' }}{% endif %}"
                         >
                     </div>
 

@@ -43,6 +43,7 @@
                 <div class="book-detail-meta">
                     <span><strong>Año:</strong> {{ libro.anio_publicacion }}</span>
                     <span><strong>Código:</strong> {{ libro.codigo }}</span>
+                    <span><strong>Stock:</strong> {{ libro.stock }}</span>
                 </div>
 
                 <div class="book-detail-synopsis">
@@ -72,22 +73,28 @@
                 </div>
 
                 <div class="book-detail-actions">
-                    {% if libro.estado == "disponible" or libro.estado == "preventa" %}
-                        {% if libro.stock > 0 %}
-                        <form method="post" action="{% url 'pedidos:agregar' libro.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-brand book-detail-cart">
-                                Agregar al carrito
+                    {% if libro.activo %}
+                        {% if libro.estado == "disponible" or libro.estado == "preventa" %}
+                            {% if libro.stock > 0 %}
+                            <form method="post" action="{% url 'pedidos:agregar' libro.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-brand book-detail-cart">
+                                    Agregar al carrito
+                                </button>
+                            </form>
+                            {% else %}
+                            <button type="button" class="btn btn-brand book-detail-cart" disabled>
+                                Sin stock
                             </button>
-                        </form>
+                            {% endif %}
                         {% else %}
                         <button type="button" class="btn btn-brand book-detail-cart" disabled>
-                            Sin stock
+                            Agregar al carrito
                         </button>
                         {% endif %}
                     {% else %}
                     <button type="button" class="btn btn-brand book-detail-cart" disabled>
-                        Agregar al carrito
+                        Inactivo
                     </button>
                     {% endif %}
 
@@ -98,6 +105,7 @@
                     >
                         Editar libro
                     </a>
+                    {% if libro.activo %}
                     <a
                         class="btn btn-outline-brand"
                         href="{% url 'catalogo:desactivar_libro' libro.slug %}"
@@ -105,9 +113,14 @@
                         Dar de baja
                     </a>
                     {% endif %}
+                    {% endif %}
                 </div>
 
-                {% if libro.estado == "disponible" or libro.estado == "preventa" %}
+                {% if not libro.activo %}
+                <p class="book-detail-note">
+                    Este libro está dado de baja. Reactívalo desde el panel de administración para volver a venderlo.
+                </p>
+                {% elif libro.estado == "disponible" or libro.estado == "preventa" %}
                     {% if libro.stock > 0 %}
                     <p class="book-detail-note">
                         Agrégalo a tu reserva y confirma cuando estés listo.

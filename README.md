@@ -1,30 +1,85 @@
-# Librería Universo Parral
+<p align="center">
+  <img src="static/images/logo.png" alt="Logo de Librería Universo Parral" width="220">
+</p>
+
+<h1 align="center">Librería Universo Parral</h1>
+
+<p align="center">
+  <em>Tradición y cultura desde 1928</em><br>
+  Catálogo online y reserva de libros para una librería independiente de Parral, Chile.
+</p>
+
+
+
+
+## Descripción
 
 Sistema web de catálogo y reserva de libros desarrollado con Django, para una librería independiente con venta online, reserva de ejemplares, retiro en tienda y despacho a todo Chile.
 
----
+Las personas pueden explorar el catálogo, ver el detalle de cada libro y armar una lista de reserva que se guarda en la sesión del navegador, con validación de stock, IVA de 19 %, costo de envío y un comprobante simulado. El personal autorizado administra libros y géneros desde un panel protegido y desde el administrador de Django.
+
+
 
 ## Ficha de registro
 
-**Nombre de la Organización:** Librería Universo Parral
+| Campo | Detalle |
+|---|---|
+| **Nombre de la Organización** | Librería Universo Parral |
+| **Modelo de Negocio / Giro** | Librería independiente con catálogo online y venta de libros. |
+| **Integrantes del Equipo** | Benjamín Anabalón (21.715.412-K) |
+| **Entidad de Contexto / Agrupación (ORM)** | `GeneroLiterario` |
+| **Entidad Principal Gestionable (ORM)** | `Libro` |
+| **Propósito de la Sesión (`request.session`)** | Lista de reserva de ejemplares con validación de stock, cálculo de subtotal, IVA 19%, costo de envío y comprobante simulado. |
 
-**Modelo de Negocio / Giro:** Librería independiente con catálogo online y venta de libros.
+---
 
-**Integrantes del Equipo:** Benjamín Anabalón (21.715.412-K)
+## Funcionalidades
 
-**Entidad de Contexto / Agrupación (ORM):** GeneroLiterario
+**Catálogo público**
+- Tarjetas de Bootstrap con portada, título, autor, precio y estado.
+- Buscador multicampo (título, código, autor y sinopsis) con objetos `Q`.
+- Filtro por género y orden por título (A-Z, Z-A) o precio (menor a mayor, mayor a menor).
+- Paginación de 12 libros por página.
+- Ficha de detalle accesible por *slug*, con libros relacionados del mismo género.
 
-**Entidad Principal Gestionable (ORM):** Libros
+**Reserva en sesión**
+- Agregar libros desde el detalle, validando estado y stock.
+- Modificar cantidades (0 elimina), eliminar un libro y vaciar la reserva.
+- Desglose con subtotal, IVA 19 %, envío (retiro en tienda o despacho) y total en CLP.
+- Contador de unidades en el ícono del carrito del menú, en todas las páginas.
+- Confirmación con inicio de sesión: descuenta stock y genera un comprobante simulado.
 
-**Propósito de la Sesión (request.session):** Lista de reserva de ejemplares con validación de stock, cálculo de subtotal, IVA 19%, costo de envío y comprobante simulado.
+**Cuentas y seguridad**
+- Registro con validación de RUT y correo; contraseñas protegidas con hash.
+- Inicio de sesión con usuario o correo; cierre de sesión por POST.
+- Perfil de usuario con RUT, teléfono, comuna, dirección y rol.
+- Protección CSRF en todos los formularios POST.
+
+**Gestión (administradores)**
+- Crear y editar libros con portada, dar de baja con pantalla de confirmación (baja lógica).
+- Crear y editar géneros literarios.
+- Administrador de Django personalizado: títulos corporativos, `list_display`, `list_filter`, `search_fields`, `list_editable` y `fieldsets`.
+
+---
+
+## Tecnologías
+
+| Componente | Uso |
+|---|---|
+| Python 3.12+ y Django 6.1.3 | Framework back end |
+| SQLite | Base de datos de desarrollo |
+| Bootstrap 5 (local) | Interfaz responsiva |
+| Pillow | Portadas de los libros (`ImageField`) |
+| django-environ / python-dotenv | Variables de entorno |
 
 ---
 
 
+---
 
 ## Instalación y ejecución
 
-Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
+Requisito: **Python 3.12 o superior**. Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
 
 1. **Crear y activar el entorno virtual**
    ```powershell
@@ -37,26 +92,36 @@ Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
    pip install -r requirements.txt
    ```
 
-3. **Aplicar migraciones**
+3. **Configurar las variables de entorno**
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+   Abre el archivo `.env` y reemplaza `SECRET_KEY` por una clave propia. Puedes generar una con:
+   ```powershell
+   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+   ```
+   El archivo `.env` está en `.gitignore` y no se sube al repositorio.
+
+4. **Aplicar migraciones**
    ```powershell
    python manage.py migrate
    ```
 
-4. **Poblar la base de datos con datos de ejemplo**
+5. **Poblar la base de datos con datos de ejemplo** (4 géneros, 8 libros y 2 usuarios de prueba)
    ```powershell
    python manage.py poblar_datos
    ```
 
-5. **Iniciar el servidor**
+6. **Iniciar el servidor**
    ```powershell
-   python manage.py runserver 
+   python manage.py runserver
    ```
-
-
+   El sitio queda disponible en http://127.0.0.1:8000/
 
 ---
 
 ## Credenciales de prueba
+
 
 | Rol | Email | Clave | Acceso |
 |---|---|---|---|
@@ -64,12 +129,21 @@ Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
 | Cliente | `cliente@libreriauniverso.cl` | `Cliente12345!` | Sitio público |
 
 
+> Para ingresar al panel de Django (`/admin/`) se usa el usuario `admin`, no el correo. En el sitio público (`/login/`) se puede usar usuario o correo.
+> Estas credenciales son solo para pruebas locales.
 
 ---
 
 
 
-# Bitácora de Prompts (uso técnico y ético de IA)
+
+---
+
+
+## Bitácora de Prompts
+
+Uso técnico y ético de inteligencia artificial.
+
 
 **Herramienta(s) utilizada(s):** ChatGPT y OpenCode (agente de IA en el editor)
 
@@ -81,10 +155,9 @@ Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
 | 2 | Catálogo público con búsqueda, filtros y paginación | Documentado |
 | 3 | Reserva en sesión con IVA, envío y comprobante | Documentado |
 
+### Caso 1: Registro y login con validaciones
 
-## Caso 1: Registro y login con validaciones
-
-### Prompt utilizado
+#### Prompt utilizado
 
 > Necesito hacer un sistema de registro y login. Ya tengo los templates y el modelo de datos listo.
 >
@@ -94,13 +167,14 @@ Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
 >   1. Email: correo ya registrado y correo con formato incorrecto.
 >   2. RUT: formato incorrecto. Formato correcto: 11.111.111-K
 
-### Respuesta técnica
+#### Respuesta técnica
 
 La IA propuso:
 
 Código completo propuesto por la IA (versión original, antes de mis adaptaciones):
 
-**`apps/usuarios/forms.py`**
+<details>
+<summary><code>apps/usuarios/forms.py</code></summary>
 
 ```python
 import re
@@ -258,7 +332,10 @@ class LoginForm(forms.Form):
     )
 ```
 
-**`apps/usuarios/views.py`**
+</details>
+
+<details>
+<summary><code>apps/usuarios/views.py</code></summary>
 
 ```python
 from django.contrib import messages
@@ -351,21 +428,24 @@ def logout_view(request):
     return redirect("core:inicio")
 ```
 
-### Adaptación aplicada
+</details>
+
+#### Adaptación aplicada
 
 - Cambié `required=False` por `required=True` en teléfono, comuna y dirección, porque el requisito del sistema exige esos datos en el registro.
 - Cambié el formato del RUT de `11.111.111-K` a `11111111-K` (sin puntos), para que sea más cómodo de escribir para un usuario nuevo.
-### Verificación
+
+#### Verificación
 
 1. Dejé teléfono, comuna y dirección en blanco: el formulario muestra error.
 2. Usé un correo y un usuario ya registrados: el formulario muestra error.
 3. Probé formatos de RUT incorrectos: el formulario muestra error.
 
+---
 
+### Caso 2: Catálogo
 
-## Caso 2: Catálogo 
-
-### Prompt utilizado
+#### Prompt utilizado
 
 > Quiero hacer el catálogo de mi página. M
 >
@@ -377,13 +457,12 @@ def logout_view(request):
 > - Que el usuario pueda ordenar la lista por título (A-Z) (Z-A) o por precio (menor a mayor) (mayor a menor).
 > - Paginación con Paginator, 12 libros por página.
 
-### Respuesta técnica
+#### Respuesta técnica
 
 La IA propuso:
 
-
-
-**`apps/catalogo/views.py`**
+<details>
+<summary><code>apps/catalogo/views.py</code></summary>
 
 ```python
 from django.core.paginator import Paginator
@@ -456,7 +535,10 @@ def lista_libros(request):
     return render(request, "catalogo/lista.html", contexto)
 ```
 
-**`templates/catalogo/lista.html`**
+</details>
+
+<details>
+<summary><code>templates/catalogo/lista.html</code></summary>
 
 ```html
 {% extends "base.html" %}
@@ -619,12 +701,13 @@ def lista_libros(request):
 {% endblock %}
 ```
 
-### Adaptación aplicada
+</details>
+
+#### Adaptación aplicada
 
 - Agregue un enlace para cuando no se encuentren resultados de un libro. Para que sea mas comodo para el usuario y no tenga la sensacion de quedarse encerrado en la pagina
 
-
-### Verificación
+#### Verificación
 
 1. Busqué por título, código, autor y descripción: el catálogo devuelve los libros correctos.
 2. Filtré por género: solo aparecen libros de ese género.
@@ -633,179 +716,43 @@ def lista_libros(request):
 7. Una búsqueda sin coincidencias muestra el mensaje con el enlace para ver todo el catálogo.
 8. el catalogo abre perfectamente sin havber iniciado sesion.
 
-## Caso 3: Reserva en sesión, desglose económico y comprobante
+---
 
-### Prompt utilizado
+### Caso 3: Reserva en sesión, desglose económico y comprobante
 
-> Necesito implementar la reserva de libros usando `request.session`, sin crear
-> modelos nuevos ni migraciones.
->
-> - Guardar los libros elegidos con su cantidad y validar que la cantidad no
->   supere el stock disponible.
-> - Permitir cambiar la cantidad (0 elimina el libro), eliminar un libro
->   individual y vaciar toda la reserva.
-> - Calcular subtotal, IVA de 19 %, envío (retiro $0 y despacho $4.000) y total
->   final en pesos chilenos.
-> - Al confirmar, pedir inicio de sesión, descontar stock, generar un
->   comprobante simulado con fecha, datos del usuario, libros y totales, y
->   vaciar la sesión.
-> - Mostrar el total de unidades en un contador del navbar con un context
->   processor.
+#### Prompt utilizado
 
-### Respuesta técnica
-
-La IA propuso separar la lógica de la sesión en un módulo `carrito.py`, usar un
-diccionario `{"<libro_id>": cantidad}` y recalcular siempre los precios desde la
-base de datos para no confiar en valores enviados por el navegador.
-
-**`apps/pedidos/carrito.py`** (resumen)
-
-```python
-CARRITO_SESION = "carrito"
-ENVIO_SESION = "envio_reserva"
-COSTOS_ENVIO = {"retiro": Decimal("0"), "despacho": Decimal("4000")}
-IVA = Decimal("0.19")
-
-
-def obtener_carrito(request):
-    carrito = request.session.get(CARRITO_SESION, {})
-    if not isinstance(carrito, dict):
-        return {}
-
-    limpio = {}
-    for libro_id, cantidad in carrito.items():
-        try:
-            cantidad = int(cantidad)
-        except (TypeError, ValueError):
-            continue
-        if cantidad > 0:
-            limpio[str(libro_id)] = cantidad
-    return limpio
-
-
-def calcular_totales(items, tipo_envio):
-    subtotal = sum((item["subtotal"] for item in items), Decimal("0"))
-    iva = (subtotal * IVA).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
-    envio = COSTOS_ENVIO.get(tipo_envio, Decimal("0"))
-    total = subtotal + iva + envio
-    return {
-        "subtotal_fmt": formato_clp(subtotal),
-        "iva_fmt": formato_clp(iva),
-        "envio_fmt": formato_clp(envio),
-        "total_fmt": formato_clp(total),
-    }
-```
-
-**`apps/pedidos/views.py`** (confirmación)
-
-```python
-@login_required
-def confirmar_reserva(request):
-    if request.method != "POST":
-        return redirect("pedidos:reserva")
-
-    carrito = obtener_carrito(request)
-
-    with transaction.atomic():
-        libros = {
-            str(libro.pk): libro
-            for libro in Libro.objects.select_for_update().filter(
-                pk__in=[int(libro_id) for libro_id in carrito],
-                activo=True,
-            )
-        }
-
-        for libro_id, cantidad in carrito.items():
-            libro = libros.get(libro_id)
-            if libro is None or cantidad > libro.stock:
-                error = "El stock cambió. Revisa tu reserva."
-                break
-
-        # Descuenta stock y deja el libro en estado "agotado" si llega a 0.
-        # Guarda el comprobante en request.session["comprobante"] y vacía el carrito.
-```
-
-El contador global se resolvió con un context processor registrado en
-`settings.py`:
-
-```python
-def carrito_context(request):
-    carrito = request.session.get("carrito", {})
-    total_items = sum(int(c) for c in carrito.values()) if isinstance(carrito, dict) else 0
-    return {"carrito_total_items": total_items}
-```
-
-### Adaptación aplicada
-
-- Usé `{"<libro_id>": cantidad}` en la sesión y no guardé precios: cada vez que
-  se abre la reserva se leen `precio` y `stock` actuales desde la base de datos.
-- Reemplacé el envío fijo por un selector retiro/despacho guardado en sesión y
-  redondeé el IVA a peso entero con `ROUND_HALF_UP`.
-- Agregué `@require_POST` al botón "Agregar al carrito" y `{% csrf_token %}` en
-  todos los formularios POST.
-- La confirmación revalida el stock dentro de `transaction.atomic()` con
-  `select_for_update()`, descuenta unidades y deja el libro en `agotado` cuando
-  el stock llega a cero.
-- Si un usuario anónimo confirma, el login lo devuelve a la reserva; el GET a
-  `confirmar/` redirige a la reserva para evitar el error 405.
-- El comprobante se guarda en `request.session["comprobante"]` y se muestra en
-  una vista protegida con `@login_required`, sin persistencia en la base de
-  datos.
-- La portada se muestra junto al título y al autor dentro de la misma columna,
-  sin agregar columnas nuevas a la tabla.
-- La tabla de la reserva se adaptó a móvil ocultando la columna de precio y
-  mostrando el valor bajo el título. Las cantidades y el método de entrega se
-  actualizan solos con un `onchange` simple, sin botones de actualización.
-
-### Verificación
-
-1. Agregué un libro al carrito y el contador del navbar mostró las unidades.
-2. Subtotal, IVA (19 %), envío y total coinciden con el cálculo manual en CLP.
-3. Cambié la cantidad a 0 y el libro se eliminó; también probé "Eliminar" y
-   "Vaciar reserva".
-4. Intenté ingresar una cantidad mayor al stock: se ajustó al máximo disponible.
-5. Cambié entre retiro y despacho: el envío pasó de $0 a $4.000 y el total se
-   recalculó automáticamente al cambiar la opción.
-6. Cambié una cantidad y presioné Enter: la reserva se actualizó sin eliminar
-   ningún libro ni vaciar la sesión.
-7. Confirmé sin sesión: el sistema redirigió al login y luego volvió a la
-   reserva.
-8. Confirmé con un usuario autenticado: el stock se descontó, el carrito quedó
-   vacío y el comprobante mostró folio, fecha, cliente, libros y totales.
-9. Al agotarse el stock, el libro quedó en estado "agotado" y ya no se pudo
-   agregar.
-10. La reserva se revisó en 360, 390, 768 y 1280 px sin desbordamiento
-    horizontal.
-
-
-
-   # Caso 3 
-
-   Prompt 
-   Necesito agregar a mi pagina un carrito de compras guardado en request.session .
- Quiero: 
+```text
+Necesito agregar a mi pagina un carrito de compras guardado en request.session .
+Quiero:
 1.	Crear vista de la reserva, donde se pueda:
 - Modificar cantidad de libros
- ( 1.Minimo 1. Si el cliente pone 0, eliminar de la reserva)
+( 1.Minimo 1. Si el cliente pone 0, eliminar de la reserva)
 ( 2. Que el cliente no pueda reservar mas libros de los que hay en stock)
-	- Eliminar un item
-	- Vaciar toda la reserva
-	-Boton  para confirmar reserva con login_required que 
+- Eliminar un item
+- Vaciar toda la reserva
+-Boton  para confirmar reserva con login_required que
 (1. Genere un comprobante de venta simulado, mostrando Fecha emisión, datos del usuario, libros reservados y desglose economico)
 (2. Vacie el carrito luego de confirmar reserva)
 (3. Descontar stock de libros)
 2. Un desglose económico donde:
 -muestre el subtotal
 -iva aplicado al subtotal
--Envio 
-	1. Retiro en tienda Valor = $0CLP
-	2. Despacho Valor = $4000CLP
+-Envio
+1. Retiro en tienda Valor = $0CLP
+2. Despacho Valor = $4000CLP
 - Final total en pesos chilenos (CLP)
+```
+
+#### Respuesta técnica
 
 
- apps/pedidos/carrito.py
 
- from decimal import ROUND_HALF_UP, Decimal
+<details>
+<summary><code>apps/pedidos/carrito.py</code></summary>
+
+```python
+from decimal import ROUND_HALF_UP, Decimal
 
 from apps.catalogo.models import Libro
 
@@ -912,11 +859,14 @@ def calcular_totales(items, tipo_envio):
         "total": total,
         "total_fmt": formato_clp(total),
     }
+```
 
+</details>
 
-apps/pedidos/views.py
+<details>
+<summary><code>apps/pedidos/views.py</code></summary>
 
-
+```python
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -1171,3 +1121,209 @@ def ver_comprobante(request):
         "pedidos/comprobante.html",
         {"comprobante": comprobante},
     )
+```
+
+</details>
+
+<details>
+<summary><code>apps/pedidos/templates/pedidos/reserva.html</code></summary>
+
+```html
+{% extends "base.html" %}
+
+{% block title %}Mi reserva | Librería Universo{% endblock %}
+{% block description %}Revisa los libros de tu reserva en Librería Universo.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+            <div class="section-heading mb-0">
+                <span class="eyebrow">Carrito</span>
+                <h1>Mi reserva</h1>
+                <p>Ajusta cantidades y elige cómo recibir tus libros.</p>
+            </div>
+
+            <a class="btn btn-outline-brand" href="{% url 'catalogo:lista' %}">
+                Seguir explorando
+            </a>
+        </div>
+
+        {% if items %}
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <form method="post" action="{% url 'pedidos:reserva' %}">
+                    {% csrf_token %}
+
+                    <div class="admin-table-card">
+                        <div class="table-responsive">
+                            <table class="table admin-table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Libro</th>
+                                        <th scope="col">Precio</th>
+                                        <th scope="col">Cantidad</th>
+                                        <th scope="col">Subtotal</th>
+                                        <th scope="col" class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ item.libro.titulo }}</strong>
+                                            <div class="admin-table-description">
+                                                {{ item.libro.autor }}
+                                            </div>
+                                        </td>
+                                        <td>{{ item.libro.precio_formateado }}</td>
+                                        <td style="min-width: 8rem;">
+                                            <input
+                                                type="number"
+                                                class="form-control form-control-sm"
+                                                name="cantidad_{{ item.libro.pk }}"
+                                                value="{{ item.cantidad }}"
+                                                min="0"
+                                                max="{{ item.libro.stock }}"
+                                                aria-label="Cantidad de {{ item.libro.titulo }}"
+                                            >
+                                            <div class="form-text">
+                                                Máximo {{ item.libro.stock }}. 0 elimina.
+                                            </div>
+                                        </td>
+                                        <td>{{ item.subtotal_fmt }}</td>
+                                        <td class="text-end">
+                                            <button
+                                                type="submit"
+                                                name="eliminar"
+                                                value="{{ item.libro.pk }}"
+                                                class="btn btn-outline-brand btn-sm"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <button type="submit" name="actualizar" value="1" class="btn btn-brand">
+                            Actualizar cantidades
+                        </button>
+                        <button type="submit" name="vaciar" value="1" class="btn btn-outline-brand">
+                            Vaciar reserva
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="admin-form-card">
+                    <h2 class="h5 mb-3">Desglose económico</h2>
+
+                    <dl class="mb-0">
+                        <div class="d-flex justify-content-between gap-3">
+                            <dt class="fw-normal">Subtotal</dt>
+                            <dd class="mb-0">{{ totales.subtotal_fmt }}</dd>
+                        </div>
+                        <div class="d-flex justify-content-between gap-3">
+                            <dt class="fw-normal">IVA (19%)</dt>
+                            <dd class="mb-0">{{ totales.iva_fmt }}</dd>
+                        </div>
+                        <div class="d-flex justify-content-between gap-3">
+                            <dt class="fw-normal">Envío</dt>
+                            <dd class="mb-0">{{ totales.envio_fmt }}</dd>
+                        </div>
+                    </dl>
+
+                    <hr>
+
+                    <form method="post" action="{% url 'pedidos:reserva' %}">
+                        {% csrf_token %}
+
+                        <fieldset>
+                            <legend class="form-label">Método de entrega</legend>
+
+                            <div class="form-check">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="tipo_envio"
+                                    id="envio-retiro"
+                                    value="retiro"
+                                    {% if tipo_envio == "retiro" %}checked{% endif %}
+                                >
+                                <label class="form-check-label" for="envio-retiro">
+                                    Retiro en tienda ($0)
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="tipo_envio"
+                                    id="envio-despacho"
+                                    value="despacho"
+                                    {% if tipo_envio == "despacho" %}checked{% endif %}
+                                >
+                                <label class="form-check-label" for="envio-despacho">
+                                    Despacho ($4.000)
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <button type="submit" name="envio" value="1" class="btn btn-outline-brand btn-sm mt-3">
+                            Actualizar entrega
+                        </button>
+                    </form>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between fw-bold fs-5">
+                        <span>Total</span>
+                        <span>{{ totales.total_fmt }}</span>
+                    </div>
+
+                    <form method="post" action="{% url 'pedidos:confirmar' %}" class="mt-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-brand w-100">
+                            Confirmar reserva
+                        </button>
+                    </form>
+
+                    {% if not user.is_authenticated %}
+                    <p class="form-text mt-2 mb-0">
+                        Al confirmar se te pedirá iniciar sesión.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="admin-form-card text-center">
+            <h2 class="h4">Tu reserva está vacía</h2>
+            <p class="mb-4">Agrega libros desde el catálogo para comenzar.</p>
+            <a class="btn btn-brand" href="{% url 'catalogo:lista' %}">
+                Ir al catálogo
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+```
+
+</details>
+
+#### Adaptación aplicada
+
+- Creé un context processor para mostrar en el ícono del carrito cuántos libros hay en la reserva.
+- Hice que las cantidades y la entrega se actualicen solas.
+
+#### Verificación
+- Creé un context processor para mostrar en el ícono del carrito cuántos libros hay en la reserva.
+- Hice que las cantidades y la entrega se actualicen solas.

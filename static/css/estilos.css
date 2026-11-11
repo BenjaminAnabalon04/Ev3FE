@@ -682,6 +682,17 @@ a:hover {
     text-transform: uppercase;
 }
 
+.book-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.book-card-actions .btn {
+    justify-content: center;
+}
+
 /* Libros relacionados */
 .related-books {
     border-top: 1px solid var(--borde);
