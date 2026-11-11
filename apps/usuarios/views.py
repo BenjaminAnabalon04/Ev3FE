@@ -34,9 +34,6 @@ def login_view(request):
     if request.method == "POST" and form.is_valid():
         email = form.cleaned_data["email"].strip().lower()
         password = form.cleaned_data["password"]
-
-        # El backend estándar autentica con username, por eso primero
-        # buscamos al usuario por su correo y luego usamos su username.
         usuario = (
             User.objects.filter(email__iexact=email)
             .only("username")

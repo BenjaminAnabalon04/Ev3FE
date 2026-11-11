@@ -72,14 +72,24 @@
                 </div>
 
                 <div class="book-detail-actions">
-                    <button
-                        type="button"
-                        class="btn btn-brand book-detail-cart"
-                        data-libro-id="{{ libro.pk }}"
-                        disabled
-                    >
+                    {% if libro.estado == "disponible" or libro.estado == "preventa" %}
+                        {% if libro.stock > 0 %}
+                        <form method="post" action="{% url 'pedidos:agregar' libro.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-brand book-detail-cart">
+                                Agregar al carrito
+                            </button>
+                        </form>
+                        {% else %}
+                        <button type="button" class="btn btn-brand book-detail-cart" disabled>
+                            Sin stock
+                        </button>
+                        {% endif %}
+                    {% else %}
+                    <button type="button" class="btn btn-brand book-detail-cart" disabled>
                         Agregar al carrito
                     </button>
+                    {% endif %}
 
                     {% if es_administrador %}
                     <a
@@ -88,13 +98,23 @@
                     >
                         Editar libro
                     </a>
+                    <a
+                        class="btn btn-outline-brand"
+                        href="{% url 'catalogo:desactivar_libro' libro.slug %}"
+                    >
+                        Dar de baja
+                    </a>
                     {% endif %}
                 </div>
 
                 {% if libro.estado == "disponible" or libro.estado == "preventa" %}
-                <p class="book-detail-note">
-                    El carrito de compras estará disponible próximamente.
-                </p>
+                    {% if libro.stock > 0 %}
+                    <p class="book-detail-note">
+                        Agrégalo a tu reserva y confirma cuando estés listo.
+                    </p>
+                    {% else %}
+                    <p class="book-detail-note">Sin stock disponible por ahora.</p>
+                    {% endif %}
                 {% else %}
                 <p class="book-detail-note">
                     Este título no está disponible actualmente.

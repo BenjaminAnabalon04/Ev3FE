@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Mi reserva | Librería Universo{% endblock %}
+{% block description %}Revisa los libros de tu reserva en Librería Universo.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+            <div class="section-heading mb-0">
+                <span class="eyebrow">Carrito</span>
+                <h1>Mi reserva</h1>
+                <p>Ajusta cantidades y elige cómo recibir tus libros.</p>
+            </div>
+
+            <a class="btn btn-outline-brand" href="{% url 'catalogo:lista' %}">
+                Seguir explorando
+            </a>
+        </div>
+
+        {% if items %}
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <form method="post" action="{% url 'pedidos:reserva' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="actualizar" value="1">
+
+                    <div class="admin-table-card">
+                        <div class="table-responsive">
+                            <table class="table admin-table reserva-table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Libro</th>
+                                        <th scope="col" class="d-none d-md-table-cell">Precio</th>
+                                        <th scope="col">Cantidad</th>
+                                        <th scope="col">Subtotal</th>
+                                        <th scope="col" class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items %}
+                                    <tr>
+                                        <td>
+                                            <div class="reserva-libro">
+                                                {% if item.libro.portada %}
+                                                <img
+                                                    class="reserva-portada"
+                                                    src="{{ item.libro.portada.url }}"
+                                                    alt="Portada de {{ item.libro.titulo }}"
+                                                >
+                                                {% else %}
+                                                <span class="reserva-portada reserva-portada-vacia" aria-hidden="true">
+                                                    {{ item.libro.titulo|first }}
+                                                </span>
+                                                {% endif %}
+
+                                                <div class="reserva-libro-datos">
+                                                    <strong>{{ item.libro.titulo }}</strong>
+                                                    <div class="admin-table-description">
+                                                        {{ item.libro.autor }}
+                                                    </div>
+                                                    <div class="admin-table-description d-md-none">
+                                                        {{ item.libro.precio_formateado }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="d-none d-md-table-cell">{{ item.libro.precio_formateado }}</td>
+                                        <td class="reserva-cantidad">
+                                            <input
+                                                type="number"
+                                                class="form-control form-control-sm"
+                                                name="cantidad_{{ item.libro.pk }}"
+                                                value="{{ item.cantidad }}"
+                                                min="0"
+                                                max="{{ item.libro.stock }}"
+                                                aria-label="Cantidad de {{ item.libro.titulo }}"
+                                                onchange="this.form.submit()"
+                                            >
+                                            <div class="form-text">
+                                                Stock Disponible: {{ item.libro.stock }}. 
+                                            </div>
+                                        </td>
+                                        <td>{{ item.subtotal_fmt }}</td>
+                                        <td class="text-end">
+                                            <button
+                                                type="submit"
+                                                form="form-eliminar"
+                                                name="eliminar"
+                                                value="{{ item.libro.pk }}"
+                                                class="btn btn-outline-brand btn-sm"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="d-none">Actualizar cantidades</button>
+                </form>
+
+                <form id="form-eliminar" method="post" action="{% url 'pedidos:reserva' %}">
+                    {% csrf_token %}
+                </form>
+
+                <form method="post" action="{% url 'pedidos:reserva' %}" class="mt-3">
+                    {% csrf_token %}
+                    <button type="submit" name="vaciar" value="1" class="btn btn-outline-brand">
+                        Vaciar reserva
+                    </button>
+                </form>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="admin-form-card">
+                    <h2 class="h5 mb-3">Desglose económico</h2>
+
+                    <dl class="mb-0">
+                        <div class="d-flex justify-content-between gap-3">
+                            <dt class="fw-normal">Subtotal</dt>
+                            <dd class="mb-0">{{ totales.subtotal_fmt }}</dd>
+                        </div>
+                        <div class="d-flex justify-content-between gap-3">
+                            <dt class="fw-normal">IVA (19%)</dt>
+                            <dd class="mb-0">{{ totales.iva_fmt }}</dd>
+                        </div>
+                        <div class="d-flex justify-content-between gap-3">
+                            <dt class="fw-normal">Envío</dt>
+                            <dd class="mb-0">{{ totales.envio_fmt }}</dd>
+                        </div>
+                    </dl>
+
+                    <hr>
+
+                    <form method="post" action="{% url 'pedidos:reserva' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="envio" value="1">
+
+                        <fieldset>
+                            <legend class="form-label">Método de entrega</legend>
+
+                            <div class="form-check">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="tipo_envio"
+                                    id="envio-retiro"
+                                    value="retiro"
+                                    {% if tipo_envio == "retiro" %}checked{% endif %}
+                                    onchange="this.form.submit()"
+                                >
+                                <label class="form-check-label" for="envio-retiro">
+                                    Retiro en tienda ($0)
+                                </label>
+                            </div>
+
+                            <div class="form-check">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="tipo_envio"
+                                    id="envio-despacho"
+                                    value="despacho"
+                                    {% if tipo_envio == "despacho" %}checked{% endif %}
+                                    onchange="this.form.submit()"
+                                >
+                                <label class="form-check-label" for="envio-despacho">
+                                    Despacho ($4.000)
+                                </label>
+                            </div>
+                        </fieldset>
+                    </form>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between fw-bold fs-5">
+                        <span>Total</span>
+                        <span>{{ totales.total_fmt }}</span>
+                    </div>
+
+                    <form method="post" action="{% url 'pedidos:confirmar' %}" class="mt-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-brand w-100">
+                            Confirmar reserva
+                        </button>
+                    </form>
+
+                    {% if not user.is_authenticated %}
+                    <p class="form-text mt-2 mb-0">
+                        Al confirmar se te pedirá iniciar sesión.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="admin-form-card text-center">
+            <h2 class="h4">Tu reserva está vacía</h2>
+            <p class="mb-4">Agrega libros desde el catálogo para comenzar.</p>
+            <a class="btn btn-brand" href="{% url 'catalogo:lista' %}">
+                Ir al catálogo
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Comprobante {{ comprobante.folio }} | Librería Universo{% endblock %}
+{% block description %}Comprobante simulado de reserva en Librería Universo.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width: 900px;">
+        <div class="admin-form-card">
+            <div class="d-flex flex-wrap justify-content-between gap-3">
+                <div>
+                    <span class="eyebrow">Reserva confirmada</span>
+                    <h1 class="h3 mb-1">Comprobante de venta</h1>
+                    <p class="text-muted mb-0">
+                        Documento simulado, sin validez tributaria.
+                    </p>
+                </div>
+
+                <div class="text-end">
+                    <div><strong>Folio:</strong> {{ comprobante.folio }}</div>
+                    <div><strong>Emisión:</strong> {{ comprobante.fecha }}</div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h2 class="h6">Datos del cliente</h2>
+            <p class="mb-1">{{ comprobante.usuario.nombre }}</p>
+            <p class="mb-1">{{ comprobante.usuario.email }}</p>
+            <p class="mb-1">RUT: {{ comprobante.usuario.rut|default:"—" }}</p>
+            <p class="mb-0">Entrega: {{ comprobante.envio_tipo }}</p>
+
+            {% if comprobante.usuario.direccion %}
+            <p class="mb-0">
+                {{ comprobante.usuario.direccion }}, {{ comprobante.usuario.comuna }}
+            </p>
+            {% endif %}
+
+            <hr>
+
+            <div class="table-responsive">
+                <table class="table admin-table align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Código</th>
+                            <th scope="col">Libro</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in comprobante.items %}
+                        <tr>
+                            <td><code>{{ item.codigo }}</code></td>
+                            <td>{{ item.titulo }}</td>
+                            <td>{{ item.cantidad }}</td>
+                            <td>{{ item.precio_fmt }}</td>
+                            <td>{{ item.subtotal_fmt }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <dl class="mb-0" style="min-width: 17rem;">
+                    <div class="d-flex justify-content-between gap-3">
+                        <dt class="fw-normal">Subtotal</dt>
+                        <dd class="mb-0">{{ comprobante.subtotal_fmt }}</dd>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3">
+                        <dt class="fw-normal">IVA (19%)</dt>
+                        <dd class="mb-0">{{ comprobante.iva_fmt }}</dd>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3">
+                        <dt class="fw-normal">Envío</dt>
+                        <dd class="mb-0">{{ comprobante.envio_fmt }}</dd>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3 fw-bold border-top pt-2 mt-2">
+                        <dt>Total</dt>
+                        <dd class="mb-0">{{ comprobante.total_fmt }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+                <a href="{% url 'catalogo:lista' %}" class="btn btn-brand">
+                    Volver al catálogo
+                </a>
+                <a href="{% url 'pedidos:reserva' %}" class="btn btn-outline-brand">
+                    Ver mi reserva
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

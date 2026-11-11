@@ -194,6 +194,27 @@ def editar_libro(request, slug):
 
 @login_required
 @user_passes_test(puede_gestionar)
+def desactivar_libro(request, slug):
+    libro = get_object_or_404(Libro, slug=slug)
+
+    if request.method == "POST":
+        libro.activo = False
+        libro.save(update_fields=["activo", "fecha_actualizacion"])
+        messages.success(
+            request,
+            f'El libro "{libro.titulo}" fue dado de baja del catálogo.',
+        )
+        return redirect("catalogo:lista")
+
+    return render(
+        request,
+        "catalogo/gestion/libro_confirmar_baja.html",
+        {"libro": libro},
+    )
+
+
+@login_required
+@user_passes_test(puede_gestionar)
 def lista_generos(request):
     generos = (
         GeneroLiterario.objects.annotate(libros_count=Count("libros"))

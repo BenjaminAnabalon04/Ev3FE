@@ -82,6 +82,14 @@
                     <a href="{% url 'catalogo:lista' %}" class="btn btn-outline-brand">
                         Cancelar
                     </a>
+                    {% if form.instance.pk and form.instance.activo %}
+                    <a
+                        href="{% url 'catalogo:desactivar_libro' form.instance.slug %}"
+                        class="btn btn-outline-brand"
+                    >
+                        Dar de baja
+                    </a>
+                    {% endif %}
                 </div>
             </form>
         </div>

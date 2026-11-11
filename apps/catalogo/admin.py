@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import GeneroLiterario, Libro
 
 
-admin.site.site_header = "Librería Universo - Panel de Administración"
+admin.site.site_header = "Librería Universo - Panel de Control"
 admin.site.site_title = "Librería Universo Admin"
 admin.site.index_title = "Gestión del Catálogo e Inventario"
 
@@ -23,3 +23,30 @@ class LibroAdmin(admin.ModelAdmin):
     list_editable = ("precio", "stock", "estado", "activo")
     prepopulated_fields = {"slug": ("titulo",)}
     list_per_page = 15
+    fieldsets = (
+        (
+            "Identificación",
+            {
+                "fields": ("codigo", "titulo", "slug", "genero"),
+            },
+        ),
+        (
+            "Detalles editoriales",
+            {
+                "fields": ("autor", "editorial", "anio_publicacion", "sinopsis"),
+            },
+        ),
+        (
+            "Inventario y publicación",
+            {
+                "fields": (
+                    "precio",
+                    "stock",
+                    "estado",
+                    "portada",
+                    "destacado",
+                    "activo",
+                ),
+            },
+        ),
+    )

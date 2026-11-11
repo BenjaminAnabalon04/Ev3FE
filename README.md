@@ -58,7 +58,7 @@ Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
 
 ## Credenciales de prueba
 
-| Rol | Email| Clave |
+| Rol | Email | Clave | Acceso |
 |---|---|---|---|
 | Administrador | `admin@libreriauniverso.cl` | `Admin12345!` | http://127.0.0.1:8000/admin/ |
 | Cliente | `cliente@libreriauniverso.cl` | `Cliente12345!` | Sitio público |
@@ -71,14 +71,15 @@ Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
 
 # Bitácora de Prompts (uso técnico y ético de IA)
 
-**Herramienta(s) utilizada(s):** (COMPLETAR: ej. ChatGPT, Claude, Gemini, Copilot)
+**Herramienta(s) utilizada(s):** ChatGPT y OpenCode (agente de IA en el editor)
 
 **Criterio de uso:** La IA se utilizó como apoyo técnico. Cada sugerencia fue revisada, adaptada a los requisitos del proyecto y probada antes de incorporarla.
 
 | Caso | Tema | Estado |
 |---|---|---|
-| 1 | Registro y login con validaciones | 
-| 2 | Catalogo | 
+| 1 | Registro y login con validaciones | Documentado |
+| 2 | Catálogo público con búsqueda, filtros y paginación | Documentado |
+| 3 | Reserva en sesión con IVA, envío y comprobante | Documentado |
 
 
 ## Caso 1: Registro y login con validaciones
@@ -631,3 +632,542 @@ def lista_libros(request):
 6. Un libro inactivo no aparece en el catálogo.
 7. Una búsqueda sin coincidencias muestra el mensaje con el enlace para ver todo el catálogo.
 8. el catalogo abre perfectamente sin havber iniciado sesion.
+
+## Caso 3: Reserva en sesión, desglose económico y comprobante
+
+### Prompt utilizado
+
+> Necesito implementar la reserva de libros usando `request.session`, sin crear
+> modelos nuevos ni migraciones.
+>
+> - Guardar los libros elegidos con su cantidad y validar que la cantidad no
+>   supere el stock disponible.
+> - Permitir cambiar la cantidad (0 elimina el libro), eliminar un libro
+>   individual y vaciar toda la reserva.
+> - Calcular subtotal, IVA de 19 %, envío (retiro $0 y despacho $4.000) y total
+>   final en pesos chilenos.
+> - Al confirmar, pedir inicio de sesión, descontar stock, generar un
+>   comprobante simulado con fecha, datos del usuario, libros y totales, y
+>   vaciar la sesión.
+> - Mostrar el total de unidades en un contador del navbar con un context
+>   processor.
+
+### Respuesta técnica
+
+La IA propuso separar la lógica de la sesión en un módulo `carrito.py`, usar un
+diccionario `{"<libro_id>": cantidad}` y recalcular siempre los precios desde la
+base de datos para no confiar en valores enviados por el navegador.
+
+**`apps/pedidos/carrito.py`** (resumen)
+
+```python
+CARRITO_SESION = "carrito"
+ENVIO_SESION = "envio_reserva"
+COSTOS_ENVIO = {"retiro": Decimal("0"), "despacho": Decimal("4000")}
+IVA = Decimal("0.19")
+
+
+def obtener_carrito(request):
+    carrito = request.session.get(CARRITO_SESION, {})
+    if not isinstance(carrito, dict):
+        return {}
+
+    limpio = {}
+    for libro_id, cantidad in carrito.items():
+        try:
+            cantidad = int(cantidad)
+        except (TypeError, ValueError):
+            continue
+        if cantidad > 0:
+            limpio[str(libro_id)] = cantidad
+    return limpio
+
+
+def calcular_totales(items, tipo_envio):
+    subtotal = sum((item["subtotal"] for item in items), Decimal("0"))
+    iva = (subtotal * IVA).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    envio = COSTOS_ENVIO.get(tipo_envio, Decimal("0"))
+    total = subtotal + iva + envio
+    return {
+        "subtotal_fmt": formato_clp(subtotal),
+        "iva_fmt": formato_clp(iva),
+        "envio_fmt": formato_clp(envio),
+        "total_fmt": formato_clp(total),
+    }
+```
+
+**`apps/pedidos/views.py`** (confirmación)
+
+```python
+@login_required
+def confirmar_reserva(request):
+    if request.method != "POST":
+        return redirect("pedidos:reserva")
+
+    carrito = obtener_carrito(request)
+
+    with transaction.atomic():
+        libros = {
+            str(libro.pk): libro
+            for libro in Libro.objects.select_for_update().filter(
+                pk__in=[int(libro_id) for libro_id in carrito],
+                activo=True,
+            )
+        }
+
+        for libro_id, cantidad in carrito.items():
+            libro = libros.get(libro_id)
+            if libro is None or cantidad > libro.stock:
+                error = "El stock cambió. Revisa tu reserva."
+                break
+
+        # Descuenta stock y deja el libro en estado "agotado" si llega a 0.
+        # Guarda el comprobante en request.session["comprobante"] y vacía el carrito.
+```
+
+El contador global se resolvió con un context processor registrado en
+`settings.py`:
+
+```python
+def carrito_context(request):
+    carrito = request.session.get("carrito", {})
+    total_items = sum(int(c) for c in carrito.values()) if isinstance(carrito, dict) else 0
+    return {"carrito_total_items": total_items}
+```
+
+### Adaptación aplicada
+
+- Usé `{"<libro_id>": cantidad}` en la sesión y no guardé precios: cada vez que
+  se abre la reserva se leen `precio` y `stock` actuales desde la base de datos.
+- Reemplacé el envío fijo por un selector retiro/despacho guardado en sesión y
+  redondeé el IVA a peso entero con `ROUND_HALF_UP`.
+- Agregué `@require_POST` al botón "Agregar al carrito" y `{% csrf_token %}` en
+  todos los formularios POST.
+- La confirmación revalida el stock dentro de `transaction.atomic()` con
+  `select_for_update()`, descuenta unidades y deja el libro en `agotado` cuando
+  el stock llega a cero.
+- Si un usuario anónimo confirma, el login lo devuelve a la reserva; el GET a
+  `confirmar/` redirige a la reserva para evitar el error 405.
+- El comprobante se guarda en `request.session["comprobante"]` y se muestra en
+  una vista protegida con `@login_required`, sin persistencia en la base de
+  datos.
+- La portada se muestra junto al título y al autor dentro de la misma columna,
+  sin agregar columnas nuevas a la tabla.
+- La tabla de la reserva se adaptó a móvil ocultando la columna de precio y
+  mostrando el valor bajo el título. Las cantidades y el método de entrega se
+  actualizan solos con un `onchange` simple, sin botones de actualización.
+
+### Verificación
+
+1. Agregué un libro al carrito y el contador del navbar mostró las unidades.
+2. Subtotal, IVA (19 %), envío y total coinciden con el cálculo manual en CLP.
+3. Cambié la cantidad a 0 y el libro se eliminó; también probé "Eliminar" y
+   "Vaciar reserva".
+4. Intenté ingresar una cantidad mayor al stock: se ajustó al máximo disponible.
+5. Cambié entre retiro y despacho: el envío pasó de $0 a $4.000 y el total se
+   recalculó automáticamente al cambiar la opción.
+6. Cambié una cantidad y presioné Enter: la reserva se actualizó sin eliminar
+   ningún libro ni vaciar la sesión.
+7. Confirmé sin sesión: el sistema redirigió al login y luego volvió a la
+   reserva.
+8. Confirmé con un usuario autenticado: el stock se descontó, el carrito quedó
+   vacío y el comprobante mostró folio, fecha, cliente, libros y totales.
+9. Al agotarse el stock, el libro quedó en estado "agotado" y ya no se pudo
+   agregar.
+10. La reserva se revisó en 360, 390, 768 y 1280 px sin desbordamiento
+    horizontal.
+
+
+
+   # Caso 3 
+
+   Prompt 
+   Necesito agregar a mi pagina un carrito de compras guardado en request.session .
+ Quiero: 
+1.	Crear vista de la reserva, donde se pueda:
+- Modificar cantidad de libros
+ ( 1.Minimo 1. Si el cliente pone 0, eliminar de la reserva)
+( 2. Que el cliente no pueda reservar mas libros de los que hay en stock)
+	- Eliminar un item
+	- Vaciar toda la reserva
+	-Boton  para confirmar reserva con login_required que 
+(1. Genere un comprobante de venta simulado, mostrando Fecha emisión, datos del usuario, libros reservados y desglose economico)
+(2. Vacie el carrito luego de confirmar reserva)
+(3. Descontar stock de libros)
+2. Un desglose económico donde:
+-muestre el subtotal
+-iva aplicado al subtotal
+-Envio 
+	1. Retiro en tienda Valor = $0CLP
+	2. Despacho Valor = $4000CLP
+- Final total en pesos chilenos (CLP)
+
+
+ apps/pedidos/carrito.py
+
+ from decimal import ROUND_HALF_UP, Decimal
+
+from apps.catalogo.models import Libro
+
+CARRITO_SESION = "carrito"
+ENVIO_SESION = "envio_reserva"
+
+ENVIO_RETIRO = "retiro"
+ENVIO_DESPACHO = "despacho"
+
+COSTOS_ENVIO = {
+    ENVIO_RETIRO: Decimal("0"),
+    ENVIO_DESPACHO: Decimal("4000"),
+}
+
+IVA = Decimal("0.19")
+
+
+def obtener_carrito(request):
+    carrito = request.session.get(CARRITO_SESION, {})
+    if not isinstance(carrito, dict):
+        return {}
+
+    limpio = {}
+    for libro_id, cantidad in carrito.items():
+        try:
+            cantidad = int(cantidad)
+        except (TypeError, ValueError):
+            continue
+
+        if cantidad > 0:
+            limpio[str(libro_id)] = cantidad
+
+    return limpio
+
+
+def guardar_carrito(request, carrito):
+    request.session[CARRITO_SESION] = carrito
+    request.session.modified = True
+
+
+def obtener_envio(request):
+    envio = request.session.get(ENVIO_SESION, ENVIO_RETIRO)
+    return envio if envio in COSTOS_ENVIO else ENVIO_RETIRO
+
+
+def guardar_envio(request, envio):
+    request.session[ENVIO_SESION] = (
+        envio if envio in COSTOS_ENVIO else ENVIO_RETIRO
+    )
+    request.session.modified = True
+
+
+def formato_clp(valor):
+    return f"${valor:,.0f}".replace(",", ".")
+
+
+def obtener_items(carrito):
+    ids = []
+    for libro_id in carrito:
+        try:
+            ids.append(int(libro_id))
+        except (TypeError, ValueError):
+            continue
+
+    libros = (
+        Libro.objects.filter(pk__in=ids, activo=True)
+        .select_related("genero")
+        .order_by("titulo")
+    )
+
+    items = []
+    for libro in libros:
+        cantidad = min(carrito.get(str(libro.pk), 0), libro.stock)
+
+        if cantidad <= 0:
+            continue
+
+        subtotal = libro.precio * cantidad
+        items.append(
+            {
+                "libro": libro,
+                "cantidad": cantidad,
+                "subtotal": subtotal,
+                "subtotal_fmt": formato_clp(subtotal),
+            }
+        )
+
+    return items
+
+
+def calcular_totales(items, tipo_envio):
+    subtotal = sum((item["subtotal"] for item in items), Decimal("0"))
+    iva = (subtotal * IVA).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    envio = COSTOS_ENVIO.get(tipo_envio, Decimal("0"))
+    total = subtotal + iva + envio
+
+    return {
+        "subtotal": subtotal,
+        "subtotal_fmt": formato_clp(subtotal),
+        "iva": iva,
+        "iva_fmt": formato_clp(iva),
+        "envio": envio,
+        "envio_fmt": formato_clp(envio),
+        "total": total,
+        "total_fmt": formato_clp(total),
+    }
+
+
+apps/pedidos/views.py
+
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_POST
+
+from apps.catalogo.models import Libro
+
+from .carrito import (
+    ENVIO_RETIRO,
+    calcular_totales,
+    formato_clp,
+    guardar_carrito,
+    guardar_envio,
+    obtener_carrito,
+    obtener_envio,
+    obtener_items,
+)
+
+
+def ver_reserva(request):
+    carrito = obtener_carrito(request)
+
+    if request.method == "POST":
+        if "vaciar" in request.POST:
+            guardar_carrito(request, {})
+            messages.success(request, "La reserva fue vaciada.")
+            return redirect("pedidos:reserva")
+
+        if "eliminar" in request.POST:
+            carrito.pop(request.POST.get("eliminar", ""), None)
+            guardar_carrito(request, carrito)
+            messages.success(request, "El libro fue eliminado de la reserva.")
+            return redirect("pedidos:reserva")
+
+        if "envio" in request.POST:
+            guardar_envio(request, request.POST.get("tipo_envio", ENVIO_RETIRO))
+            messages.success(request, "Método de entrega actualizado.")
+            return redirect("pedidos:reserva")
+
+        if "actualizar" in request.POST:
+            for libro_id in list(carrito):
+                try:
+                    libro = Libro.objects.get(pk=libro_id)
+                except (Libro.DoesNotExist, ValueError):
+                    carrito.pop(libro_id, None)
+                    continue
+
+                try:
+                    cantidad = int(
+                        request.POST.get(
+                            f"cantidad_{libro_id}",
+                            carrito[libro_id],
+                        )
+                    )
+                except (TypeError, ValueError):
+                    cantidad = carrito[libro_id]
+
+                if libro.stock <= 0:
+                    carrito.pop(libro_id, None)
+                    messages.warning(
+                        request,
+                        f'"{libro.titulo}" ya no tiene stock.',
+                    )
+                elif cantidad <= 0:
+                    carrito.pop(libro_id, None)
+                elif cantidad > libro.stock:
+                    carrito[libro_id] = libro.stock
+                    messages.warning(
+                        request,
+                        f'Solo hay {libro.stock} unidades de "{libro.titulo}".',
+                    )
+                else:
+                    carrito[libro_id] = cantidad
+
+            guardar_carrito(request, carrito)
+            messages.success(request, "Reserva actualizada.")
+            return redirect("pedidos:reserva")
+
+    items = obtener_items(carrito)
+    carrito_sincronizado = {
+        str(item["libro"].pk): item["cantidad"] for item in items
+    }
+
+    if carrito_sincronizado != carrito:
+        guardar_carrito(request, carrito_sincronizado)
+        carrito = carrito_sincronizado
+        messages.warning(request, "Ajustamos tu reserva al stock disponible.")
+
+    tipo_envio = obtener_envio(request)
+    totales = calcular_totales(items, tipo_envio)
+
+    return render(
+        request,
+        "pedidos/reserva.html",
+        {
+            "items": items,
+            "tipo_envio": tipo_envio,
+            "totales": totales,
+        },
+    )
+
+
+@require_POST
+def agregar_al_carrito(request, libro_id):
+    libro = get_object_or_404(Libro, pk=libro_id, activo=True)
+
+    if libro.estado not in (Libro.Estado.DISPONIBLE, Libro.Estado.PREVENTA):
+        messages.error(request, f'"{libro.titulo}" no está disponible.')
+        return redirect("catalogo:detalle", slug=libro.slug)
+
+    if libro.stock <= 0:
+        messages.error(request, f'"{libro.titulo}" no tiene stock.')
+        return redirect("catalogo:detalle", slug=libro.slug)
+
+    carrito = obtener_carrito(request)
+    cantidad = carrito.get(str(libro.pk), 0)
+
+    if cantidad >= libro.stock:
+        messages.warning(
+            request,
+            f'Ya tienes el máximo disponible de "{libro.titulo}".',
+        )
+    else:
+        carrito[str(libro.pk)] = cantidad + 1
+        guardar_carrito(request, carrito)
+        messages.success(request, f'"{libro.titulo}" se agregó a tu reserva.')
+
+    return redirect("catalogo:detalle", slug=libro.slug)
+
+
+@login_required
+def confirmar_reserva(request):
+    # Si vuelve desde el login con un GET, lo mandamos a la reserva.
+    if request.method != "POST":
+        return redirect("pedidos:reserva")
+
+    carrito = obtener_carrito(request)
+
+    if not carrito:
+        messages.error(request, "Tu reserva está vacía.")
+        return redirect("pedidos:reserva")
+
+    tipo_envio = obtener_envio(request)
+    error = None
+
+    with transaction.atomic():
+        ids = [int(libro_id) for libro_id in carrito]
+        libros = {
+            str(libro.pk): libro
+            for libro in Libro.objects.select_for_update().filter(
+                pk__in=ids,
+                activo=True,
+            )
+        }
+
+        for libro_id, cantidad in carrito.items():
+            libro = libros.get(libro_id)
+
+            if libro is None:
+                error = "Uno de los libros de tu reserva ya no está disponible."
+                break
+
+            if cantidad > libro.stock:
+                error = (
+                    f'Solo quedan {libro.stock} unidades de "{libro.titulo}".'
+                )
+                break
+
+        if error is None:
+            items = [
+                {
+                    "libro": libro,
+                    "cantidad": carrito[libro_id],
+                    "subtotal": libro.precio * carrito[libro_id],
+                }
+                for libro_id, libro in libros.items()
+            ]
+
+            totales = calcular_totales(items, tipo_envio)
+
+            detalles = []
+            for item in items:
+                libro = item["libro"]
+                cantidad = item["cantidad"]
+
+                libro.stock -= cantidad
+                if libro.stock == 0:
+                    libro.estado = Libro.Estado.AGOTADO
+
+                libro.save(
+                    update_fields=["stock", "estado", "fecha_actualizacion"]
+                )
+
+                detalles.append(
+                    {
+                        "codigo": libro.codigo,
+                        "titulo": libro.titulo,
+                        "cantidad": cantidad,
+                        "precio_fmt": formato_clp(libro.precio),
+                        "subtotal_fmt": formato_clp(item["subtotal"]),
+                    }
+                )
+
+    if error:
+        messages.error(request, error)
+        return redirect("pedidos:reserva")
+
+    perfil = getattr(request.user, "perfil", None)
+
+    request.session["comprobante"] = {
+        "folio": f"RES-{timezone.now():%Y%m%d%H%M%S}-{request.user.pk}",
+        "fecha": timezone.localtime().strftime("%d/%m/%Y %H:%M"),
+        "usuario": {
+            "nombre": request.user.get_full_name() or request.user.username,
+            "email": request.user.email,
+            "rut": getattr(perfil, "rut", "") or "",
+            "telefono": getattr(perfil, "telefono", "") or "",
+            "direccion": getattr(perfil, "direccion", "") or "",
+            "comuna": getattr(perfil, "comuna", "") or "",
+        },
+        "items": detalles,
+        "envio_tipo": (
+            "Retiro en tienda"
+            if tipo_envio == ENVIO_RETIRO
+            else "Despacho a domicilio"
+        ),
+        "subtotal_fmt": totales["subtotal_fmt"],
+        "iva_fmt": totales["iva_fmt"],
+        "envio_fmt": totales["envio_fmt"],
+        "total_fmt": totales["total_fmt"],
+    }
+
+    guardar_carrito(request, {})
+    guardar_envio(request, ENVIO_RETIRO)
+    messages.success(request, "Reserva confirmada. Tu comprobante está listo.")
+
+    return redirect("pedidos:comprobante")
+
+
+@login_required
+def ver_comprobante(request):
+    comprobante = request.session.get("comprobante")
+
+    if not comprobante:
+        messages.info(request, "No hay un comprobante para mostrar.")
+        return redirect("pedidos:reserva")
+
+    return render(
+        request,
+        "pedidos/comprobante.html",
+        {"comprobante": comprobante},
+    )

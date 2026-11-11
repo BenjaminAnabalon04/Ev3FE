@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Dar de baja {{ libro.titulo }} | Librería Universo{% endblock %}
+{% block description %}Confirma la baja lógica de un libro en Librería Universo.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container" style="max-width: 720px;">
+        <nav class="book-detail-breadcrumb mb-4" aria-label="Ruta de navegación">
+            <a href="{% url 'catalogo:lista' %}">Catálogo</a>
+            <span aria-hidden="true">/</span>
+            <a href="{% url 'catalogo:detalle' libro.slug %}">{{ libro.titulo }}</a>
+            <span aria-hidden="true">/</span>
+            <span>Dar de baja</span>
+        </nav>
+
+        <div class="admin-form-card">
+            <span class="eyebrow">Administración</span>
+            <h1>Dar de baja el libro</h1>
+
+            <p class="admin-form-intro">
+                El libro dejará de aparecer en el catálogo público y no podrá
+                agregarse a nuevas reservas. El registro se conserva en la base
+                de datos y puede reactivarse desde el panel de administración.
+            </p>
+
+            <dl class="admin-summary">
+                <div>
+                    <dt>Código</dt>
+                    <dd><code>{{ libro.codigo }}</code></dd>
+                </div>
+                <div>
+                    <dt>Título</dt>
+                    <dd>{{ libro.titulo }}</dd>
+                </div>
+                <div>
+                    <dt>Autor</dt>
+                    <dd>{{ libro.autor }}</dd>
+                </div>
+                <div>
+                    <dt>Género</dt>
+                    <dd>{{ libro.genero.nombre }}</dd>
+                </div>
+                <div>
+                    <dt>Stock</dt>
+                    <dd>{{ libro.stock }} unidad{{ libro.stock|pluralize:"es" }}</dd>
+                </div>
+                <div>
+                    <dt>Estado</dt>
+                    <dd>{{ libro.get_estado_display }}</dd>
+                </div>
+            </dl>
+
+            <form method="post" class="admin-form-actions">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-brand">
+                    Confirmar baja
+                </button>
+                <a
+                    href="{% url 'catalogo:detalle' libro.slug %}"
+                    class="btn btn-outline-brand"
+                >
+                    Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

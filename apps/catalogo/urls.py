@@ -12,6 +12,11 @@ urlpatterns = [
         views.editar_libro,
         name="editar_libro",
     ),
+    path(
+        "gestion/libros/<slug:slug>/desactivar/",
+        views.desactivar_libro,
+        name="desactivar_libro",
+    ),
     path("gestion/generos/", views.lista_generos, name="lista_generos"),
     path("gestion/generos/nuevo/", views.crear_genero, name="crear_genero"),
     path(

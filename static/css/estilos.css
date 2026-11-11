@@ -182,6 +182,26 @@ a:hover {
     height: 20px;
 }
 
+.header-cart {
+    position: relative;
+}
+
+.header-cart-badge {
+    background: var(--vino);
+    border-radius: 999px;
+    color: var(--crema);
+    font-size: 0.62rem;
+    font-weight: 700;
+    height: 1.1rem;
+    line-height: 1.1rem;
+    min-width: 1.1rem;
+    padding: 0 0.28rem;
+    position: absolute;
+    right: -0.35rem;
+    text-align: center;
+    top: -0.3rem;
+}
+
 .header-user {
     color: var(--marron);
     font-size: 0.86rem;
@@ -248,7 +268,8 @@ a:hover {
 }
 
 .site-alert {
-    background: var(--papel);
+    background: var(--crema);
+    border: 1px solid var(--borde);
     border-left: 4px solid var(--dorado);
     border-radius: 0.5rem;
     box-shadow: 0 6px 18px rgba(58, 7, 18, 0.08);
@@ -259,19 +280,23 @@ a:hover {
 }
 
 .site-alert-success {
-    border-left-color: #3f7d5a;
-    color: #24503a;
-}
-
-.site-alert-error,
-.site-alert-danger {
+    background: var(--crema-2);
     border-left-color: var(--vino);
     color: var(--vino);
 }
 
-.site-alert-warning {
+.site-alert-error,
+.site-alert-danger {
+    background: var(--vino);
+    border-color: var(--vino-oscuro);
     border-left-color: var(--dorado);
-    color: #7a5a17;
+    color: var(--crema);
+}
+
+.site-alert-warning {
+    background: var(--crema-2);
+    border-left-color: var(--dorado);
+    color: #6b4e14;
 }
 
 /* Portada */
@@ -1264,6 +1289,15 @@ a:hover {
     justify-content: center;
 }
 
+.book-detail-actions form {
+    flex: 1 1 12rem;
+}
+
+.book-detail-actions form .btn {
+    justify-content: center;
+    width: 100%;
+}
+
 .book-detail-cart:disabled {
     cursor: not-allowed;
     opacity: 0.6;
@@ -1415,6 +1449,28 @@ a:hover {
     margin-top: 1.5rem;
 }
 
+.admin-summary {
+    border-top: 1px solid var(--borde);
+    display: grid;
+    gap: 0.9rem 1.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+    padding-top: 1.2rem;
+}
+
+.admin-summary dt {
+    color: var(--marron);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.admin-summary dd {
+    color: var(--tinta);
+    margin: 0;
+}
+
 @media (max-width: 575.98px) {
     .catalog-heading-row {
         align-items: stretch;
@@ -1500,6 +1556,89 @@ a:hover {
 .admin-table .btn {
     font-size: 0.78rem;
     padding: 0.4rem 0.85rem;
+}
+
+/* Tabla de reserva */
+.reserva-table thead th,
+.reserva-table tbody td {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+}
+
+.reserva-cantidad {
+    min-width: 7rem;
+}
+
+.reserva-table .form-control {
+    min-width: 4.5rem;
+}
+
+.reserva-libro {
+    align-items: center;
+    display: flex;
+    gap: 0.7rem;
+}
+
+.reserva-portada {
+    border-radius: 0.35rem;
+    box-shadow: 0 4px 10px rgba(58, 7, 18, 0.15);
+    flex: 0 0 auto;
+    height: 62px;
+    object-fit: cover;
+    width: 44px;
+}
+
+.reserva-portada-vacia {
+    align-items: center;
+    background: var(--crema);
+    border: 1px solid var(--borde);
+    color: var(--vino);
+    display: flex;
+    font-size: 1.1rem;
+    font-weight: 700;
+    justify-content: center;
+}
+
+.reserva-libro-datos {
+    min-width: 0;
+}
+
+@media (max-width: 575.98px) {
+    .reserva-table thead th,
+    .reserva-table tbody td {
+        padding-left: 0.3rem;
+        padding-right: 0.3rem;
+    }
+
+    .reserva-cantidad {
+        min-width: 4rem;
+    }
+
+    .reserva-table .form-control {
+        min-width: 0;
+    }
+
+    .reserva-table .form-text {
+        font-size: 0.62rem;
+    }
+
+    .reserva-table .admin-table-description {
+        font-size: 0.72rem;
+    }
+
+    .reserva-table .btn {
+        font-size: 0.64rem;
+        padding: 0.28rem 0.42rem;
+    }
+
+    .reserva-libro {
+        gap: 0.45rem;
+    }
+
+    .reserva-portada {
+        height: 48px;
+        width: 34px;
+    }
 }
 
 @media (max-width: 575.98px) {

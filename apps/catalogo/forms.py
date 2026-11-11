@@ -28,6 +28,23 @@ class GeneroForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         aplicar_estilos(self)
 
+    def clean(self):
+        datos = super().clean()
+        nombre = datos.get("nombre")
+
+        if nombre:
+            repetido = any(
+                existente.casefold() == nombre.casefold()
+                for existente in GeneroLiterario.objects
+                .exclude(pk=self.instance.pk)
+                .values_list("nombre", flat=True)
+            )
+
+            if repetido:
+                self.add_error("nombre", "Ya existe un género con ese nombre.")
+
+        return datos
+
 
 class LibroForm(forms.ModelForm):
     class Meta:
@@ -54,3 +71,14 @@ class LibroForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         aplicar_estilos(self)
+
+    def clean(self):
+        datos = super().clean()
+        codigo = datos.get("codigo")
+
+        if codigo and Libro.objects.filter(
+            codigo__iexact=codigo
+        ).exclude(pk=self.instance.pk).exists():
+            self.add_error("codigo", "Ya existe un libro con ese código.")
+
+        return datos
