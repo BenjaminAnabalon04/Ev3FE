@@ -149,11 +149,6 @@ Uso técnico y ético de inteligencia artificial.
 
 **Criterio de uso:** La IA se utilizó como apoyo técnico. Cada sugerencia fue revisada, adaptada a los requisitos del proyecto y probada antes de incorporarla.
 
-| Caso | Tema |
-|---|---|---|
-| 1 | Registro y login con validaciones | 
-| 2 | Catálogo público con búsqueda, filtros y paginación | 
-| 3 | Reserva en sesión con IVA, envío y comprobante |
 
 ### Caso 1: Registro y login con validaciones
 
