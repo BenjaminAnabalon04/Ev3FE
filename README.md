@@ -33,39 +33,6 @@ Las personas pueden explorar el catálogo, ver el detalle de cada libro y armar 
 
 ---
 
-## Funcionalidades
-
-**Catálogo público**
-- Tarjetas de Bootstrap con portada, título, autor, precio y estado.
-- Buscador multicampo (título, código, autor y sinopsis) con objetos `Q`.
-- Filtro por género y orden por título (A-Z, Z-A) o precio (menor a mayor, mayor a menor).
-- Paginación de 12 libros por página.
-- Ficha de detalle accesible por *slug*, con libros relacionados del mismo género.
-
-**Reserva en sesión**
-- Agregar libros desde el detalle, validando estado y stock.
-- Modificar cantidades (0 elimina), eliminar un libro y vaciar la reserva.
-- Desglose con subtotal, IVA 19 %, envío (retiro en tienda o despacho) y total en CLP.
-- Contador de unidades en el ícono del carrito del menú, en todas las páginas.
-- Confirmación con inicio de sesión: descuenta stock y genera un comprobante simulado.
-
-**Cuentas y seguridad**
-- Registro con validación de RUT y correo; contraseñas protegidas con hash.
-- Inicio de sesión con usuario o correo; cierre de sesión por POST.
-- Perfil de usuario con RUT, teléfono, comuna, dirección y rol.
-- Protección CSRF en todos los formularios POST.
-
-**Gestión (administradores)**
-- Crear y editar libros con portada, dar de baja con pantalla de confirmación (baja lógica).
-- Crear y editar géneros literarios.
-- Administrador de Django personalizado: títulos corporativos, `list_display`, `list_filter`, `search_fields`, `list_editable` y `fieldsets`.
-
----
-
-
-
----
-
 ## Instalación y ejecución
 
 Requisito: **Python 3.12 o superior**. Los comandos son para Windows (PowerShell), desde la carpeta del proyecto.
