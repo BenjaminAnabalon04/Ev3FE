@@ -62,17 +62,6 @@ Las personas pueden explorar el catálogo, ver el detalle de cada libro y armar 
 
 ---
 
-## Tecnologías
-
-| Componente | Uso |
-|---|---|
-| Python 3.12+ y Django 6.1.3 | Framework back end |
-| SQLite | Base de datos de desarrollo |
-| Bootstrap 5 (local) | Interfaz responsiva |
-| Pillow | Portadas de los libros (`ImageField`) |
-| django-environ / python-dotenv | Variables de entorno |
-
----
 
 
 ---
@@ -140,12 +129,12 @@ Requisito: **Python 3.12 o superior**. Los comandos son para Windows (PowerShell
 ---
 
 
-## Bitácora de Prompts
+## Bitácora de Prompts Inteligencia Artifical
 
 Uso técnico y ético de inteligencia artificial.
 
 
-**Herramienta(s) utilizada(s):** ChatGPT y OpenCode (agente de IA en el editor)
+**Herramienta(s) utilizada(s):** Claude y OpenCode (agente de IA en el editor)
 
 **Criterio de uso:** La IA se utilizó como apoyo técnico. Cada sugerencia fue revisada, adaptada a los requisitos del proyecto y probada antes de incorporarla.
 
